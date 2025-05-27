@@ -1,17 +1,17 @@
 {
-    "manifest_version": 3,
-    "name": "Kod Bloğu Akordiyonu (Dinamik)",
-    "version": "1.2",
-    "description": "Sayfalardaki dinamik olarak eklenen ve _ngcontent-ng-c attribute'lu <pre> bloklarını akordiyon yapar.",
-    "host_permissions": [
-      "<all_urls>"
-    ],
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"],
-        "css": ["styles.css"],
-        "run_at": "document_idle"
-      }
-    ]
-  }
+  "manifest_version": 3,
+  "name": "Kod Bloğu Akordiyonu & Kod Parçacığı Kenar Çubuğu",
+  "version": "1.3",
+  "description": "Sayfalardaki _ngcontent-ng-c öznitelikli <pre> bloklarını akordiyon yapar ve ``` ile çevrili kod parçacıklarını bir kenar çubuğunda listeler/görüntüler.",
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
