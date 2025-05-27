@@ -1,0 +1,74 @@
+.kod-blok-akordiyon-sarmalayici {
+    position: relative;
+    margin-bottom: 1em;
+  }
+  
+  .kod-blok-akordiyon-dugme {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    z-index: 10;
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 1;
+    font-family: sans-serif;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .kod-blok-bottom-dugme {
+    position: absolute;
+    bottom: 5px;
+    right: 8px;
+    z-index: 10;
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 1;
+    font-family: sans-serif;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .kod-blok-akordiyon-sarmalayici:hover .kod-blok-bottom-dugme {
+    opacity: 1;
+  }
+  
+  .kod-blok-bottom-dugme:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .kod-blok-bottom-dugme:active {
+    background-color: #d0d0d0;
+  }
+  
+  .kod-blok-icerik-kapali {
+    max-height: 6em;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .kod-blok-icerik-kapali::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .kod-blok-icerik-acik {
+    max-height: 1000vh;
+    overflow: auto;
+    transition: max-height 0.4s ease-in;
+  }
+  
+  .kod-blok-akordiyon-sarmalayici > pre {
+    margin: 0;
+  }
