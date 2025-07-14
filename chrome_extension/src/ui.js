@@ -1,172 +1,194 @@
 // chrome_extension/src/ui.js
 function truncateText(text, wordLimit = 2) {
-    if (!text) return '';
-    const words = text.split(' ');
-    if (words.length > wordLimit) {
-      return words.slice(0, wordLimit).join(' ') + '...';
-    }
-    return text;
+  if (!text) return '';
+  const words = text.split(' ');
+  if (words.length > wordLimit) {
+    return words.slice(0, wordLimit).join(' ') + '...';
+  }
+  return text;
 }
 
 function createButton(iconKey, title, onClick, extraClass = '') {
-  const btn = document.createElement('button');
-  btn.className = `markdown-${iconKey}-btn-fwk ${extraClass}`.trim();
-  btn.innerHTML = ICONS[iconKey];
-  btn.title = title;
+const btn = document.createElement('button');
+btn.className = `markdown-${iconKey}-btn-fwk ${extraClass}`.trim();
+btn.innerHTML = ICONS[iconKey];
+btn.title = title;
+if (iconKey === 'vscode') {
+  btn.onclick = (e) => {
+    onClick(e);
+  };
+} else {
   btn.onclick = (e) => {
     e.stopPropagation();
-    onClick();
+    onClick(e);
   };
-  return btn;
+}
+return btn;
 }
 
 function createEditModal(index) {
-  const currentText = detectedSections[index];
+const currentText = detectedSections[index];
 
-  const overlay = document.createElement('div');
-  overlay.className = 'edit-modal-overlay-fwk';
-  
-  const modal = document.createElement('div');
-  modal.className = 'edit-modal-content-fwk';
-  modal.onclick = (e) => e.stopPropagation();
+const overlay = document.createElement('div');
+overlay.className = 'edit-modal-overlay-fwk';
 
-  const title = document.createElement('h3');
-  title.textContent = 'Aşamayı Düzenle';
+const modal = document.createElement('div');
+modal.className = 'edit-modal-content-fwk';
+modal.onclick = (e) => e.stopPropagation();
 
-  const textarea = document.createElement('textarea');
-  textarea.value = currentText;
+const title = document.createElement('h3');
+title.textContent = 'Aşamayı Düzenle';
 
-  const actions = document.createElement('div');
-  actions.className = 'edit-modal-actions-fwk';
+const textarea = document.createElement('textarea');
+textarea.value = currentText;
 
-  const saveBtn = document.createElement('button');
-  saveBtn.textContent = 'Kaydet';
-  saveBtn.className = 'markdown-save-btn-fwk modal-btn';
-  saveBtn.onclick = () => {
-    detectedSections[index] = textarea.value;
+const actions = document.createElement('div');
+actions.className = 'edit-modal-actions-fwk';
+
+const saveBtn = document.createElement('button');
+saveBtn.textContent = 'Kaydet';
+saveBtn.className = 'markdown-save-btn-fwk modal-btn';
+saveBtn.onclick = () => {
+  detectedSections[index] = textarea.value;
+  renderSections();
+  updateCache();
+  document.body.removeChild(overlay);
+};
+
+const cancelBtn = document.createElement('button');
+cancelBtn.textContent = 'İptal';
+cancelBtn.className = 'markdown-cancel-btn-fwk modal-btn';
+cancelBtn.onclick = () => {
+  if (currentText === '') {
+    detectedSections.splice(index, 1);
     renderSections();
-    updateCache();
-    document.body.removeChild(overlay);
-  };
+  }
+  document.body.removeChild(overlay);
+};
 
-  const cancelBtn = document.createElement('button');
-  cancelBtn.textContent = 'İptal';
-  cancelBtn.className = 'markdown-cancel-btn-fwk modal-btn';
-  cancelBtn.onclick = () => {
-    if (currentText === '') {
-      detectedSections.splice(index, 1);
-      renderSections();
-    }
-    document.body.removeChild(overlay);
-  };
+overlay.onclick = () => {
+  if (currentText === '') {
+    detectedSections.splice(index, 1);
+    renderSections();
+  }
+  document.body.removeChild(overlay);
+};
 
-  overlay.onclick = () => {
-    if (currentText === '') {
-      detectedSections.splice(index, 1);
-      renderSections();
-    }
-    document.body.removeChild(overlay);
-  };
-
-  actions.append(cancelBtn, saveBtn);
-  modal.append(title, textarea, actions);
-  overlay.append(modal);
-  document.body.appendChild(overlay);
-  textarea.focus();
+actions.append(cancelBtn, saveBtn);
+modal.append(title, textarea, actions);
+overlay.append(modal);
+document.body.appendChild(overlay);
+textarea.focus();
 }
 
 function createSectionItem(section, index) {
-  const item = document.createElement('div');
-  item.className = 'markdown-section-item-fwk';
-  item.dataset.index = index;
-  item.title = section;
+const item = document.createElement('div');
+item.className = 'markdown-section-item-fwk';
+item.dataset.index = index;
+item.title = section;
 
-  const textWrapper = document.createElement('div');
-  textWrapper.className = 'markdown-section-text-fwk';
-  
-  const title = document.createElement('span');
-  title.className = 'markdown-section-title-fwk';
-  title.textContent = truncateText(section, 2);
+const textWrapper = document.createElement('div');
+textWrapper.className = 'markdown-section-text-fwk';
 
-  textWrapper.append(title);
+const title = document.createElement('span');
+title.className = 'markdown-section-title-fwk';
+title.textContent = truncateText(section, 2);
 
-  const actions = document.createElement('div');
-  actions.className = 'markdown-section-actions-fwk';
+textWrapper.append(title);
 
-  const copyBtn = createButton('copy', 'Kopyala', () => copySection(index));
-  const editBtn = createButton('edit', 'Düzenle', () => createEditModal(index));
-  const deleteBtn = createButton('delete', 'Sil', () => deleteSection(index));
-  const sendBtn = createButton('send', 'Prompt\'a Gönder', () => sendToPrompt(index));
+const actions = document.createElement('div');
+actions.className = 'markdown-section-actions-fwk';
 
-  actions.append(copyBtn, editBtn, deleteBtn, sendBtn);
-  item.append(textWrapper, actions);
-  return item;
+const copyBtn = createButton('copy', 'Kopyala', () => copySection(index));
+const editBtn = createButton('edit', 'Düzenle', () => createEditModal(index));
+const deleteBtn = createButton('delete', 'Sil', () => deleteSection(index));
+const sendBtn = createButton('send', 'Prompt\'a Gönder', () => sendToPrompt(index));
+
+actions.append(copyBtn, editBtn, deleteBtn, sendBtn);
+item.append(textWrapper, actions);
+return item;
 }
 
 function renderSections() {
-  body.innerHTML = '';
-  if (detectedSections.length === 0) {
-    body.innerHTML = `<div class="markdown-sidebar-empty-fwk">Manuel olarak aşama ekleyin.</div>`;
-  } else {
-    detectedSections.forEach((section, index) => {
-      const item = createSectionItem(section, index);
-      body.appendChild(item);
-    });
-  }
-  updateCache();
+body.innerHTML = '';
+if (detectedSections.length === 0) {
+  body.innerHTML = `<div class="markdown-sidebar-empty-fwk">Manuel olarak aşama ekleyin.</div>`;
+} else {
+  detectedSections.forEach((section, index) => {
+    const item = createSectionItem(section, index);
+    body.appendChild(item);
+  });
+}
+updateCache();
 }
 
 function createSidebar() {
-  sidebar = document.createElement('div');
-  sidebar.className = 'markdown-sidebar-fwk';
+sidebar = document.createElement('div');
+sidebar.className = 'markdown-sidebar-fwk';
 
-  header = document.createElement('div');
-  header.className = 'markdown-sidebar-header-fwk';
-  header.onclick = (e) => {
-    if (e.target.closest('button')) return;
-    toggleSidebar();
-  };
+header = document.createElement('div');
+header.className = 'markdown-sidebar-header-fwk';
+header.onclick = (e) => {
+  if (e.target.closest('button')) return;
+  toggleSidebar();
+};
 
-  const title = document.createElement('div');
-  title.className = 'markdown-sidebar-title-fwk';
-  title.textContent = 'Plan Aşamaları';
+const title = document.createElement('div');
+title.className = 'markdown-sidebar-title-fwk';
+title.textContent = 'Plan Aşamaları';
 
-  const buttons = document.createElement('div');
-  buttons.className = 'markdown-sidebar-buttons-fwk';
+const buttons = document.createElement('div');
+buttons.className = 'markdown-sidebar-buttons-fwk';
 
-  addStageBtn = createButton('add', 'Yeni Aşama Ekle', () => addSection('', true));
-  clearAllBtn = createButton('clear', 'Tümünü Temizle', clearAllSections);
-  toggleBtn = createButton('toggle', 'Gizle/Göster', toggleSidebar);
-  toggleBtn.style.transition = 'transform 0.2s ease-in-out';
+addStageBtn = createButton('add', 'Yeni Aşama Ekle', () => addSection('', true));
+clearAllBtn = createButton('clear', 'Tümünü Temizle', clearAllSections);
+toggleBtn = createButton('toggle', 'Gizle/Göster', toggleSidebar);
+toggleBtn.style.transition = 'transform 0.2s ease-in-out';
 
-  buttons.append(addStageBtn, clearAllBtn, toggleBtn);
-  header.append(title, buttons);
+buttons.append(addStageBtn, clearAllBtn, toggleBtn);
+header.append(title, buttons);
 
-  body = document.createElement('div');
-  body.className = 'markdown-sidebar-body-fwk';
+body = document.createElement('div');
+body.className = 'markdown-sidebar-body-fwk';
 
-  const footer = document.createElement('div');
-  footer.className = 'markdown-sidebar-footer-fwk';
+const footer = document.createElement('div');
+footer.className = 'markdown-sidebar-footer-fwk';
 
-  const importBtn = document.createElement('button');
-  importBtn.className = 'markdown-import-btn-fwk';
-  importBtn.innerHTML = ICONS.clipboard + '<span>Panodan İçe Aktar</span>';
-  importBtn.onclick = importFromClipboard;
+const importBtn = document.createElement('button');
+importBtn.className = 'markdown-import-btn-fwk';
+importBtn.innerHTML = ICONS.clipboard + '<span>Panodan İçe Aktar</span>';
+importBtn.onclick = importFromClipboard;
 
-  footer.append(importBtn);
-  sidebar.append(header, body, footer);
+footer.append(importBtn);
+sidebar.append(header, body, footer);
 
-  const historyElement = document.querySelector('ms-prompt-history');
-  if (historyElement && historyElement.parentElement) {
-    historyElement.parentElement.insertBefore(sidebar, historyElement.nextSibling);
-  } else {
-    document.body.appendChild(sidebar);
-  }
+const historyElement = document.querySelector('ms-prompt-history');
+if (historyElement && historyElement.parentElement) {
+  historyElement.parentElement.insertBefore(sidebar, historyElement.nextSibling);
+} else {
+  document.body.appendChild(sidebar);
+}
 
-  getCachedData();
-  renderSections();
-  if (isSidebarCollapsed) {
-    sidebar.classList.add('collapsed');
-    toggleBtn.style.transform = 'rotate(-90deg)';
-  }
+getCachedData();
+renderSections();
+if (isSidebarCollapsed) {
+  sidebar.classList.add('collapsed');
+  toggleBtn.style.transform = 'rotate(-90deg)';
+}
+}
+
+function enhanceActionBarWithVscodeButton(actionBar) {
+if (!actionBar || actionBar.dataset.vscodeBtnInjected === '1') {
+  return;
+}
+
+if (!actionBar.closest('ms-code-block')) {
+  return;
+}
+
+const vscodeBtn = createButton('vscode', 'Cursora Gönder', sendToVscode);
+vscodeBtn.classList.add('mat-mdc-icon-button', 'mat-unthemed');
+
+actionBar.appendChild(vscodeBtn);
+actionBar.dataset.vscodeBtnInjected = '1';
 }

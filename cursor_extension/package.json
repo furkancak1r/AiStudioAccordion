@@ -5,22 +5,32 @@
   "version": "0.1.0",
   "publisher": "furkan",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "1.99.3"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onUri"
+    "onUri",
+    "onView:aistudiocopy.pasteView",
+    "onCommand:aistudiocopy.pasteToFile"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "aistudiocopy.openAndPaste",
-        "title": "Open and Paste from AI Studio"
+        "command": "aistudiocopy.pasteToFile",
+        "title": "Paste Markdown Code to File"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "aistudiocopy.pasteView",
+          "name": "AI Studio Paster"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -32,7 +42,7 @@
   },
   "devDependencies": {
     "@types/node": "20.x",
-    "@types/vscode": "^1.74.0",
+    "@types/vscode": "^1.99.3",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
     "eslint": "^9.25.1",

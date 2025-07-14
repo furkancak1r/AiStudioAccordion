@@ -1,7 +1,7 @@
 # Ürün Gereksinimleri Dokümanı: AiStudio Plan Yöneticisi
 
 **Sürüm:** 1.0
-**Tarih:** 16 Temmuz 2024
+**Tarih:** 14.07.2025
 
 ## 1. Giriş ve Amaç
 
