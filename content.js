@@ -361,3 +361,153 @@
     });
   }).observe(document.documentElement, { childList: true, subtree: true });
 })();
+(() => {
+  const DEBUG_ENABLED = false;
+  const truncatedMessages = new Map();
+  const processingCooldowns = new Map();
+  const COOLDOWN_TIME = 100;
+  
+  function debugLog(...args) {
+    if (DEBUG_ENABLED) {
+      console.log('[AI Studio Truncator]', ...args);
+    }
+  }
+  
+  function truncateUserMessage(messageContainer) {
+    if (!messageContainer) {
+      debugLog('No message container provided');
+      return;
+    }
+    
+    const messageId = messageContainer.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    if (!messageContainer.id) messageContainer.id = messageId;
+    
+    debugLog(`Processing message ${messageId}`);
+    
+    const lastProcessed = processingCooldowns.get(messageId);
+    if (lastProcessed && Date.now() - lastProcessed < COOLDOWN_TIME) {
+      debugLog(`Message ${messageId} in cooldown, skipping`);
+      return;
+    }
+    
+    const textChunk = messageContainer.querySelector('ms-text-chunk');
+    if (!textChunk) {
+      debugLog(`No ms-text-chunk found in ${messageId}`);
+      return;
+    }
+    
+    const textContainer = textChunk.querySelector('div');
+    if (!textContainer) {
+      debugLog(`No div found in ms-text-chunk for ${messageId}`);
+      return;
+    }
+    
+    const currentText = textContainer.textContent || textContainer.innerText;
+    if (!currentText || currentText.trim().length === 0) {
+      debugLog(`No text content found in ${messageId}`);
+      return;
+    }
+    
+    debugLog(`Message ${messageId} text length: ${currentText.length}`);
+    
+    const words = currentText.trim().split(/\s+/);
+    debugLog(`Message ${messageId} word count: ${words.length}`);
+    
+    if (words.length <= 10) {
+      debugLog(`Message ${messageId} has ${words.length} words, no truncation needed`);
+      return;
+    }
+    
+    const storedData = truncatedMessages.get(messageId);
+    const isAlreadyTruncated = storedData && storedData.originalText;
+    
+    if (isAlreadyTruncated) {
+      if (currentText.length > storedData.truncatedText.length) {
+        debugLog(`Message ${messageId} was restored! Re-truncating from ${currentText.length} to ${storedData.truncatedText.length}`);
+        textContainer.textContent = storedData.truncatedText;
+        processingCooldowns.set(messageId, Date.now());
+      } else {
+        debugLog(`Message ${messageId} already truncated and unchanged`);
+      }
+      return;
+    }
+    
+    const truncatedText = words.slice(0, 10).join(' ');
+    debugLog(`Truncating message ${messageId}: "${currentText.substring(0, 50)}..." → "${truncatedText}"`);
+    
+    textContainer.textContent = truncatedText;
+    
+    truncatedMessages.set(messageId, {
+      originalText: currentText,
+      truncatedText: truncatedText,
+      timestamp: Date.now()
+    });
+    
+    messageContainer.classList.add('user-message-truncated');
+    messageContainer.setAttribute('data-truncated', 'true');
+    processingCooldowns.set(messageId, Date.now());
+    
+    debugLog(`Successfully truncated message ${messageId}: ${words.length} words → 10 words`);
+  }
+  
+  function processUserMessages() {
+    const allUserMessages = document.querySelectorAll('div.chat-turn-container.render.user');
+    debugLog(`Found ${allUserMessages.length} user messages on page`);
+    
+    const unprocessedMessages = document.querySelectorAll('div.chat-turn-container.render.user:not([data-truncated])');
+    debugLog(`Found ${unprocessedMessages.length} unprocessed user messages`);
+    
+    unprocessedMessages.forEach((msg, index) => {
+      debugLog(`Processing message ${index + 1}/${unprocessedMessages.length}`);
+      truncateUserMessage(msg);
+    });
+  }
+  
+  debugLog('Starting initial processing...');
+  processUserMessages();
+  
+  new MutationObserver(mutations => {
+    let newMessagesFound = false;
+    
+    for (const m of mutations) {
+      if (m.type === 'childList' && m.addedNodes.length > 0) {
+        for (const node of m.addedNodes) {
+          if (node.nodeType === 1) {
+            if (node.matches && node.matches('div.chat-turn-container.render.user')) {
+              debugLog('New user message detected via direct match');
+              truncateUserMessage(node);
+              newMessagesFound = true;
+            } else if (node.querySelectorAll) {
+              const userMessages = node.querySelectorAll('div.chat-turn-container.render.user');
+              if (userMessages.length > 0) {
+                debugLog(`Found ${userMessages.length} user messages in added node`);
+                userMessages.forEach(truncateUserMessage);
+                newMessagesFound = true;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (!newMessagesFound) {
+      const restoredMessages = document.querySelectorAll('div.chat-turn-container.render.user[data-truncated="true"]');
+      restoredMessages.forEach(container => {
+        const messageId = container.id;
+        const storedData = truncatedMessages.get(messageId);
+        if (storedData) {
+          const textContainer = container.querySelector('ms-text-chunk div');
+          if (textContainer && textContainer.textContent.length > storedData.truncatedText.length) {
+            debugLog(`Detected text restoration in ${messageId}`);
+            truncateUserMessage(container);
+          }
+        }
+      });
+    }
+  }).observe(document.documentElement, { 
+    childList: true, 
+    subtree: true
+  });
+  
+  debugLog('User message truncator initialized with enhanced debugging');
+})();
