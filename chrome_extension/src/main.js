@@ -123,6 +123,7 @@
 
   initializeSidebar();
   scanAndEnhanceActionBars();
+  loadIDEPreference(); // Load IDE preference on startup
   
   observer.observe(document.documentElement, {
     childList: true,

@@ -1,11 +1,23 @@
 {
   "manifest_version": 3,
   "name": "Kod Bloğu Akordiyonu",
-  "version": "2.1",
-  "description": "Sayfalardaki _ngcontent-ng-c öznitelikli <pre> bloklarını akordiyon yapar, araç çubuğuna tam kod kopyala düğmesi ekler ve Cursor deep-link entegrasyonu sunar.",
+  "version": "2.2",
+  "description": "Sayfalardaki _ngcontent-ng-c öznitelikli <pre> bloklarını akordiyon yapar, araç çubuğuna tam kod kopyala düğmesi ekler ve IDE deep-link entegrasyonu sunar.",
   "host_permissions": [
     "https://aistudio.google.com/*"
   ],
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "IDE Tercihi",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png", 
+      "128": "icon128.png"
+    }
+  },
   "content_scripts": [
     {
       "matches": [

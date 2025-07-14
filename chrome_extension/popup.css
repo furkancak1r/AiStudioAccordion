@@ -1,0 +1,182 @@
+/* popup.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    width: 320px;
+    min-height: 400px;
+}
+
+.popup-container {
+    background: #ffffff;
+    border-radius: 16px;
+    margin: 8px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.popup-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.popup-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.popup-header p {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.4;
+}
+
+.ide-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ide-option {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f7fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    text-align: left;
+    width: 100%;
+}
+
+.ide-option:hover {
+    border-color: #4299e1;
+    background: #ebf8ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15);
+}
+
+.ide-option.selected {
+    border-color: #3182ce;
+    background: #bee3f8;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.ide-icon {
+    margin-right: 12px;
+    color: #4299e1;
+    flex-shrink: 0;
+}
+
+.ide-info {
+    flex: 1;
+}
+
+.ide-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.ide-info p {
+    font-size: 12px;
+    color: #718096;
+}
+
+.default-badge {
+    background: #48bb78;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cursor-option .ide-icon {
+    color: #00d4aa;
+}
+
+.vscode-option .ide-icon {
+    color: #0078d4;
+}
+
+.popup-footer {
+    text-align: center;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.note {
+    font-size: 11px;
+    color: #a0aec0;
+    line-height: 1.4;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .popup-container {
+        background: #1a202c;
+        color: #e2e8f0;
+    }
+    
+    .popup-header h2 {
+        color: #f7fafc;
+    }
+    
+    .popup-header p {
+        color: #a0aec0;
+    }
+    
+    .ide-option {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .ide-option:hover {
+        background: #374151;
+        border-color: #60a5fa;
+    }
+    
+    .ide-option.selected {
+        background: #1e3a8a;
+        border-color: #3b82f6;
+    }
+    
+    .ide-info h3 {
+        color: #f7fafc;
+    }
+    
+    .ide-info p {
+        color: #a0aec0;
+    }
+    
+    .popup-footer {
+        border-color: #4a5568;
+    }
+}
+
+/* Animation for selection */
+@keyframes selectPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.ide-option.selecting {
+    animation: selectPulse 0.3s ease-in-out;
+}

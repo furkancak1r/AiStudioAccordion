@@ -117,7 +117,10 @@ function sendToVscode(event) {
   const encodedPath = encodeURIComponent(filePath);
   const encodedContent = encodeURIComponent(contentToSend);
   
-  const uri = `cursor://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
+  // Get current IDE preference
+  const currentIDE = getSelectedIDE();
+  const uriScheme = currentIDE === 'cursor' ? 'cursor' : 'vscode';
+  const uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
   
   window.open(uri, '_self');
 }

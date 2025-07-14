@@ -187,7 +187,11 @@ if (!actionBar.closest('ms-code-block')) {
   return;
 }
 
-const vscodeBtn = createButton('vscode', 'Cursora Gönder', sendToVscode);
+// Get current IDE preference for button title
+const currentIDE = getSelectedIDE();
+const buttonTitle = currentIDE === 'cursor' ? 'Cursora Gönder' : 'VS Code\'a Gönder';
+
+const vscodeBtn = createButton('vscode', buttonTitle, sendToVscode);
 vscodeBtn.classList.add('mat-mdc-icon-button', 'mat-unthemed');
 
 actionBar.appendChild(vscodeBtn);

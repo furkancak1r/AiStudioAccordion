@@ -3,7 +3,7 @@
   "displayName": "🚀 AI Studio Copy Helper",
   "description": "📋 Paste code from clipboard to files - works with path comments",
   "version": "0.2.1",
-  "publisher": "aistudio",
+  "publisher": "furkan",
   "engines": {
     "vscode": "^1.99.0"
   },
@@ -34,7 +34,17 @@
         "title": "AI Studio: Paste Code to File",
         "icon": "$(file-add)"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "AI Studio Copy",
+      "properties": {
+        "aistudiocopy.autoOpenFiles": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically open files after creating/updating them"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
