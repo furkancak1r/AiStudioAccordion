@@ -3,6 +3,5 @@ dist/
 build/
 .env
 *.log
-.vscode/
 .DS_Store
 *.vsix 
