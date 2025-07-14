@@ -8,9 +8,19 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://aistudio.google.com/*"],
-      "js": ["content.js"],
-      "css": ["styles.css"],
+      "matches": [
+        "https://aistudio.google.com/*"
+      ],
+      "js": [
+        "src/icons.js",
+        "src/state.js",
+        "src/handlers.js",
+        "src/ui.js",
+        "src/main.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
       "run_at": "document_idle"
     }
   ]
