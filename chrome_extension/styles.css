@@ -1,0 +1,431 @@
+.kod-blok-akordiyon-sarmalayici {
+  position: relative;
+  margin-bottom: 1em;
+}
+
+.kod-blok-akordiyon-dugme {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  z-index: 10;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1;
+  font-family: sans-serif;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.kod-blok-bottom-dugme {
+  position: absolute;
+  bottom: 5px;
+  right: 8px;
+  z-index: 10;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1;
+  font-family: sans-serif;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.kod-blok-akordiyon-sarmalayici:hover .kod-blok-bottom-dugme {
+  opacity: 1;
+}
+
+.kod-blok-bottom-dugme:hover {
+  background-color: #e0e0e0;
+}
+
+.kod-blok-bottom-dugme:active {
+  background-color: #d0d0d0;
+}
+
+.kod-blok-icerik-kapali {
+  max-height: 6em;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.kod-blok-icerik-kapali::-webkit-scrollbar {
+  display: none;
+}
+
+.kod-blok-icerik-acik {
+  max-height: 1000vh;
+  overflow: auto;
+  transition: max-height 0.4s ease-in;
+}
+
+.kod-blok-akordiyon-sarmalayici > pre {
+  margin: 0;
+}
+
+
+.ai-copy-full-btn {
+  background-color: #6c757d;
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  margin-left: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.ai-copy-full-btn:hover {
+  background-color: #545b62;
+}
+
+.ai-copy-full-btn:disabled {
+  background-color: #28a745;
+  cursor: default;
+}
+
+
+.floating-add-btn-fwk {
+  position: fixed;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10000;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+  user-select: none;
+  backdrop-filter: blur(10px);
+}
+
+.floating-add-btn-fwk:hover {
+  background: linear-gradient(135deg, #218838, #1ea085);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+  transform: scale(1.1);
+}
+
+.floating-add-btn-fwk:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 10px rgba(40, 167, 69, 0.4);
+}
+
+.selection-feedback-fwk {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.clickable-space {
+  transition: background-color 0.2s ease;
+}
+
+.clickable-space:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.markdown-sidebar-fwk {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 300px;
+  max-height: 350px;
+  background: #fff;
+  border: 2px solid #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  z-index: 100;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.markdown-sidebar-fwk.collapsed {
+  transform: translateX(280px);
+}
+
+.markdown-sidebar-header-fwk {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.markdown-sidebar-buttons-fwk {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.markdown-sidebar-title-fwk {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.markdown-sidebar-toggle-fwk {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.markdown-sidebar-toggle-fwk:hover {
+  background: #e9ecef;
+  color: #333;
+}
+
+.markdown-clear-all-btn-fwk {
+  background: #dc3545;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.markdown-clear-all-btn-fwk:hover {
+  background: #c82333;
+  transform: scale(1.05);
+}
+
+.markdown-clear-all-btn-fwk:active {
+  background: #bd2130;
+  transform: scale(0.95);
+}
+
+.markdown-sidebar-body-fwk {
+  max-height: calc(350px - 60px);
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.markdown-section-item-fwk {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  background: #f8f9fa;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.markdown-section-item-fwk:hover {
+  background: #e9ecef;
+  border-color: #007bff;
+}
+
+.markdown-section-text-fwk {
+  flex: 1;
+  font-size: 12px;
+  color: #000;
+  margin-right: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.markdown-section-title-fwk {
+  flex: 1;
+}
+
+.markdown-section-actions-fwk {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.markdown-section-number-fwk {
+  font-weight: 600;
+  color: #007bff;
+  margin-right: 6px;
+}
+
+.markdown-copy-btn-fwk,
+.markdown-edit-btn-fwk,
+.markdown-delete-btn-fwk,
+.markdown-add-stage-btn-fwk {
+  background: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.markdown-copy-btn-fwk:hover,
+.markdown-edit-btn-fwk:hover,
+.markdown-delete-btn-fwk:hover,
+.markdown-add-stage-btn-fwk:hover {
+  background: #0056b3;
+}
+
+.markdown-copy-btn-fwk:disabled {
+  background: #28a745;
+  cursor: default;
+}
+
+.markdown-edit-btn-fwk {
+  background: #6c757d;
+}
+
+.markdown-edit-btn-fwk:hover {
+  background: #545b62;
+}
+
+.markdown-delete-btn-fwk {
+  background: #dc3545;
+}
+
+.markdown-delete-btn-fwk:hover {
+  background: #c82333;
+}
+
+.markdown-add-stage-btn-fwk {
+  background: #28a745;
+  font-size: 14px;
+}
+
+.markdown-add-stage-btn-fwk:hover {
+  background: #218838;
+}
+
+.markdown-section-item-fwk.editing {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+.markdown-section-input-fwk {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #000;
+  background: #fff;
+  outline: none;
+}
+
+.markdown-section-edit-actions-fwk {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.markdown-save-btn-fwk,
+.markdown-cancel-btn-fwk {
+  background: #28a745;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.markdown-save-btn-fwk:hover {
+  background: #218838;
+}
+
+.markdown-cancel-btn-fwk {
+  background: #dc3545;
+}
+
+.markdown-cancel-btn-fwk:hover {
+  background: #c82333;
+}
+
+.markdown-sidebar-empty-fwk {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 13px;
+}
+
+.markdown-sidebar-fwk::-webkit-scrollbar,
+.markdown-sidebar-body-fwk::-webkit-scrollbar {
+  width: 6px;
+}
+
+.markdown-sidebar-fwk::-webkit-scrollbar-track,
+.markdown-sidebar-body-fwk::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.markdown-sidebar-fwk::-webkit-scrollbar-thumb,
+.markdown-sidebar-body-fwk::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.markdown-sidebar-fwk::-webkit-scrollbar-thumb:hover,
+.markdown-sidebar-body-fwk::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+

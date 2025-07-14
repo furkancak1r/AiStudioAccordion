@@ -84,5 +84,4 @@
 | Özellik | Nasıl kullanılır |
 |---------|-----------------|
 | Akordiyon | Angular `<pre>` bloğunun sağ üstündeki ▼ düğmesine tıklayın. Genişletildiğinde sağ altta beliren ▲ düğmesi ile kapatın. |
-| Parçacık Kenar Çubuğu | Sürüklenebilir `{}` düğmesine tıklayarak kenar çubuğunu açın/kapatın. Listede **Kopyala** veya önizlemeye tıklayarak tam görünüm açabilirsiniz. |
 | Tam-Kod Kopyala | AI Studio kartının altındaki araç çubuğunda yeni 📋 simgesine tıklayın. ✔ ile kopyalama onayı alın. |

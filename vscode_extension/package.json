@@ -1,0 +1,45 @@
+{
+  "name": "aistudiocopy",
+  "displayName": "AI Studio Copy Helper",
+  "description": "Helper tools for AI Studio, including accordion code blocks and enhanced copy functionality.",
+  "version": "0.1.0",
+  "publisher": "furkan",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onUri"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aistudiocopy.openAndPaste",
+        "title": "Open and Paste from AI Studio"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run esbuild-base -- --minify",
+    "watch": "npm run esbuild-base -- --watch",
+    "package": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "lint": "eslint . --ext .ts"
+  },
+  "devDependencies": {
+    "@types/node": "20.x",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "esbuild": "^0.25.6"
+  }
+}
