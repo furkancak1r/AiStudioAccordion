@@ -33,10 +33,8 @@ function copySection(index) {
 }
 
 function clearAllSections() {
-  if (confirm('Tüm aşamaları silmek istediğinizden emin misiniz?')) {
-    detectedSections = [];
-    renderSections();
-  }
+  detectedSections = [];
+  renderSections();
 }
 
 function toggleSidebar() {
