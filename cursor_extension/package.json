@@ -1,36 +1,40 @@
 {
   "name": "aistudiocopy",
-  "displayName": "AI Studio Copy Helper",
-  "description": "Helper tools for AI Studio, including accordion code blocks and enhanced copy functionality.",
-  "version": "0.1.0",
-  "publisher": "furkan",
+  "displayName": "🚀 AI Studio Copy Helper",
+  "description": "📋 Paste code from clipboard to files - works with path comments",
+  "version": "0.2.1",
+  "publisher": "aistudio",
   "engines": {
-    "vscode": "1.99.3"
+    "vscode": "^1.99.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Snippets",
+    "Formatters"
   ],
+  "keywords": [
+    "clipboard",
+    "paste",
+    "ai-studio",
+    "code",
+    "file"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aistudio/copy-helper"
+  },
   "activationEvents": [
-    "onUri",
-    "onView:aistudiocopy.pasteView",
-    "onCommand:aistudiocopy.pasteToFile"
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "aistudiocopy.pasteToFile",
-        "title": "Paste Markdown Code to File"
+        "title": "AI Studio: Paste Code to File",
+        "icon": "$(file-add)"
       }
-    ],
-    "views": {
-      "explorer": [
-        {
-          "id": "aistudiocopy.pasteView",
-          "name": "AI Studio Paster"
-        }
-      ]
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -45,6 +49,7 @@
     "@types/vscode": "^1.99.3",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/vsce": "^3.6.0",
     "eslint": "^9.25.1",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.8.3"
