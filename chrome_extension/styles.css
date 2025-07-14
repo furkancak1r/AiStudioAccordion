@@ -162,36 +162,46 @@
   align-items: center;
 }
 
-.markdown-sidebar-toggle-fwk,
+.markdown-toggle-btn-fwk,
 .markdown-clear-btn-fwk,
 .markdown-add-btn-fwk {
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--color-on-surface-variant, #c4c7c5);
-  padding: 8px;
+  padding: 6px;
   border-radius: 50%;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
 }
 
-.markdown-sidebar-toggle-fwk svg,
+.markdown-toggle-btn-fwk svg,
 .markdown-clear-btn-fwk svg,
 .markdown-add-btn-fwk svg {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
 }
 
 
-.markdown-sidebar-toggle-fwk:hover,
+.markdown-toggle-btn-fwk:hover,
 .markdown-clear-btn-fwk:hover,
 .markdown-add-btn-fwk:hover {
   background: var(--color-state-layer-on-surface-008, rgba(227, 227, 227, 0.08));
   color: var(--color-on-surface, #e3e3e3);
+}
+
+.markdown-toggle-btn-fwk:focus,
+.markdown-clear-btn-fwk:focus,
+.markdown-add-btn-fwk:focus,
+.markdown-toggle-btn-fwk:active,
+.markdown-clear-btn-fwk:active,
+.markdown-add-btn-fwk:active {
+  background: transparent;
+  outline: none;
 }
 
 .markdown-sidebar-body-fwk,
@@ -312,17 +322,17 @@
   background: var(--color-primary, #a8c9ff);
   color: var(--color-on-primary, #003062);
   border: none;
-  border-radius: 24px;
+  border-radius: 20px;
   font-size: 14px;
-  padding: 10px 24px;
-  width: 100%;
-  height: auto;
+  padding: 12px;
+  width: 44px;
+  height: 44px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  margin: 0 auto;
   transition: background-color 0.2s ease;
 }
 .markdown-import-btn-fwk:hover {

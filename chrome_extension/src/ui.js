@@ -156,7 +156,8 @@ footer.className = 'markdown-sidebar-footer-fwk';
 
 const importBtn = document.createElement('button');
 importBtn.className = 'markdown-import-btn-fwk';
-importBtn.innerHTML = ICONS.clipboard + '<span>Panodan İçe Aktar</span>';
+importBtn.innerHTML = ICONS.clipboard;
+importBtn.title = 'Panodan İçe Aktar';
 importBtn.onclick = importFromClipboard;
 
 footer.append(importBtn);

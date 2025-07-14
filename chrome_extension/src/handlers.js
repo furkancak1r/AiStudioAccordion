@@ -79,6 +79,9 @@ function sendToPrompt(index) {
       setTimeout(() => {
         if (!runButton.disabled) {
             runButton.click();
+            // Plan aşamasını listeden sil
+            detectedSections.splice(index, 1);
+            renderSections();
         }
       }, 100);
     } else {
