@@ -5,6 +5,10 @@ let isSidebarCollapsed = false;
 let selectedIDE = 'cursor'; // default
 const cacheKey = 'markdownCache';
 
+// Text selection variables
+let selectionToolbar = null;
+let lastSelectedText = '';
+
 function getCachedData() {
   const cached = sessionStorage.getItem(cacheKey);
   if (cached) {

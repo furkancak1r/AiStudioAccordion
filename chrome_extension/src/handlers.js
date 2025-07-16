@@ -124,3 +124,50 @@ function sendToVscode(event) {
   
   window.open(uri, '_self');
 }
+
+function addSelectedTextToStages(selectedText) {
+  if (!selectedText) return;
+  
+  if (isSidebarCollapsed) {
+    toggleSidebar();
+  }
+  
+  detectedSections.push(selectedText);
+  renderSections();
+  updateCache();
+  
+  // Visual feedback
+  const message = document.createElement('div');
+  message.className = 'selection-feedback-fwk';
+  message.textContent = 'Plan aşamalarına eklendi!';
+  message.style.position = 'fixed';
+  message.style.top = '20px';
+  message.style.right = '20px';
+  message.style.zIndex = '10001';
+  document.body.appendChild(message);
+  
+  setTimeout(() => {
+    message.remove();
+  }, 2000);
+}
+
+function sendSelectedTextToPrompt(selectedText) {
+  if (!selectedText) return;
+  
+  const promptText = `go ${selectedText}`;
+  const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
+  const runButton = document.querySelector('run-button button[type="submit"]');
+  
+  if (textarea && runButton) {
+    textarea.value = promptText;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    
+    setTimeout(() => {
+      if (!runButton.disabled) {
+        runButton.click();
+      }
+    }, 100);
+  } else {
+    console.error('Prompt textarea veya run butonu bulunamadı.');
+  }
+}

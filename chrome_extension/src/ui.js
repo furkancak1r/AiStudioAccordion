@@ -178,6 +178,67 @@ if (isSidebarCollapsed) {
 }
 }
 
+function createSelectionToolbar(selectedText, x, y) {
+  // Remove existing toolbar if present
+  removeSelectionToolbar();
+  
+  const toolbar = document.createElement('div');
+  toolbar.className = 'selection-toolbar-fwk';
+  toolbar.style.position = 'absolute';
+  toolbar.style.left = `${x}px`;
+  toolbar.style.top = `${y - 50}px`;
+  toolbar.style.zIndex = '10000';
+  
+  const addBtn = createButton('add', 'Plan Aşamalarına Ekle', () => {
+    addSelectedTextToStages(selectedText);
+    removeSelectionToolbar();
+  }, 'selection-add-btn');
+  
+  const sendBtn = createButton('send', 'Sohbete Gönder', () => {
+    sendSelectedTextToPrompt(selectedText);
+    removeSelectionToolbar();
+  }, 'selection-send-btn');
+  
+  toolbar.appendChild(addBtn);
+  toolbar.appendChild(sendBtn);
+  
+  document.body.appendChild(toolbar);
+  selectionToolbar = toolbar;
+  
+  // Auto-hide after 10 seconds
+  setTimeout(() => {
+    removeSelectionToolbar();
+  }, 10000);
+  
+  return toolbar;
+}
+
+function removeSelectionToolbar() {
+  if (selectionToolbar) {
+    selectionToolbar.remove();
+    selectionToolbar = null;
+  }
+}
+
+function handleTextSelection() {
+  const selection = window.getSelection();
+  const selectedText = selection.toString().trim();
+  
+  if (selectedText && selectedText.length > 3) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    
+    // Position toolbar at the end of selection
+    const x = rect.left + (rect.width / 2) - 50; // Center horizontally
+    const y = rect.top + window.scrollY; // Account for scroll
+    
+    lastSelectedText = selectedText;
+    createSelectionToolbar(selectedText, x, y);
+  } else {
+    removeSelectionToolbar();
+  }
+}
+
 function enhanceActionBarWithVscodeButton(actionBar) {
 if (!actionBar || actionBar.dataset.vscodeBtnInjected === '1') {
   return;

@@ -105,6 +105,39 @@
     }
   }
 
+  function setupTextSelectionListener() {
+    let selectionTimeout;
+    
+    document.addEventListener('mouseup', () => {
+      clearTimeout(selectionTimeout);
+      selectionTimeout = setTimeout(() => {
+        handleTextSelection();
+      }, 100);
+    });
+
+    document.addEventListener('keyup', (e) => {
+      // Handle keyboard selection (Shift+Arrow keys, Ctrl+A, etc.)
+      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        clearTimeout(selectionTimeout);
+        selectionTimeout = setTimeout(() => {
+          handleTextSelection();
+        }, 100);
+      }
+    });
+
+    // Hide toolbar when clicking elsewhere
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.selection-toolbar-fwk')) {
+        removeSelectionToolbar();
+      }
+    });
+
+    // Hide toolbar on scroll
+    document.addEventListener('scroll', () => {
+      removeSelectionToolbar();
+    }, true);
+  }
+
   const observer = new MutationObserver((mutations) => {
     initializeSidebar();
     
@@ -124,6 +157,7 @@
   initializeSidebar();
   scanAndEnhanceActionBars();
   loadIDEPreference(); // Load IDE preference on startup
+  setupTextSelectionListener(); // Setup text selection listener
   
   // Initialize message truncation
   if (window.AIStudioMessages) {
