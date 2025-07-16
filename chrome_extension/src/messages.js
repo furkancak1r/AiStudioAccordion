@@ -193,7 +193,14 @@
                 // Check for text changes in existing messages
                 if (mutation.type === 'characterData' || mutation.type === 'childList') {
                     const target = mutation.target;
-                    if (target.nodeType === Node.TEXT_NODE || target.nodeType === Node.ELEMENT_NODE) {
+                    if (target.nodeType === Node.TEXT_NODE) {
+                        // For text nodes, check parent element
+                        const container = target.parentElement?.closest('.turn-content, .user-prompt-container, ms-chat-turn');
+                        if (container) {
+                            shouldProcess = true;
+                        }
+                    } else if (target.nodeType === Node.ELEMENT_NODE) {
+                        // For element nodes, use closest directly
                         const container = target.closest('.turn-content, .user-prompt-container, ms-chat-turn');
                         if (container) {
                             shouldProcess = true;

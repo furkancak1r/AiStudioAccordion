@@ -130,6 +130,11 @@
     window.AIStudioMessages.init();
   }
   
+  // Initialize code block accordion
+  if (window.AIStudioAccordion) {
+    window.AIStudioAccordion.init();
+  }
+  
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,

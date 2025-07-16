@@ -29,6 +29,7 @@
         "src/handlers.js",
         "src/ui.js",
         "src/messages.js",
+        "src/accordion.js",
         "src/main.js"
       ],
       "css": [
