@@ -24,17 +24,25 @@ function updateCache() {
 
 // IDE Preference Management
 function loadIDEPreference() {
+  console.log('🔧 Loading IDE preference...');
   if (typeof chrome !== 'undefined' && chrome.storage) {
     chrome.storage.local.get(['selectedIDE'], function(result) {
+      console.log('🔧 Chrome storage result:', result);
       if (result.selectedIDE) {
         selectedIDE = result.selectedIDE;
+        console.log('🔧 Loaded IDE preference:', selectedIDE);
         updateIDEButtons();
+      } else {
+        console.log('🔧 No IDE preference found, using default:', selectedIDE);
       }
     });
+  } else {
+    console.log('🔧 Chrome storage not available, using default:', selectedIDE);
   }
 }
 
 function getSelectedIDE() {
+  console.log('🔧 Getting selected IDE:', selectedIDE);
   return selectedIDE;
 }
 

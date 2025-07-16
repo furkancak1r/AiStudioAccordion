@@ -1,4 +1,3 @@
-// chrome_extension/src/ui.js
 function truncateText(text, wordLimit = 2) {
   if (!text) return '';
   const words = text.split(' ');
@@ -284,6 +283,7 @@ vscodeBtn.appendChild(touchSpan);
 
 // Add click handler
 vscodeBtn.onclick = (e) => {
+  e.stopPropagation();
   sendToVscode(e);
 };
 

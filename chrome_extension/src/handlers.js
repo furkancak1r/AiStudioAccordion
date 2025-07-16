@@ -1,4 +1,3 @@
-// chrome_extension/src/handlers.js
 function addSection(content = '', startEditing = false) {
   if (isSidebarCollapsed) {
     toggleSidebar();
@@ -87,7 +86,9 @@ function sendToPrompt(index) {
     }
 }
 
-function sendToVscode(event) {
+async function sendToVscode(event) {
+  console.log('🚀 sendToVscode started');
+  
   const button = event.currentTarget;
   const codeBlockElement = button.closest('ms-code-block');
   if (!codeBlockElement) {
@@ -105,24 +106,54 @@ function sendToVscode(event) {
   const lines = fullCode.split('\n');
   const firstLine = lines[0].trim();
 
-  const pathMatch = firstLine.match(/^(?:\/\/|#)\s*(.*)/);
-  if (!pathMatch || !pathMatch[1].trim()) {
-    alert('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnek: // src/app.js');
+  const pathMatch = firstLine.match(/^(?:\/\/\s*(.*)|#\s*(.*)|\/\*\s*(.*?)\s*\*\/|<!--\s*(.*?)\s*-->|--\s*(.*)|%\s*(.*))/);
+  if (!pathMatch) {
+    alert('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m');
     return;
   }
   
-  const filePath = pathMatch[1].trim();
-  const contentToSend = fullCode;
+  const filePath = (pathMatch[1] || pathMatch[2] || pathMatch[3] || pathMatch[4] || pathMatch[5] || pathMatch[6] || '').trim();
   
-  const encodedPath = encodeURIComponent(filePath);
-  const encodedContent = encodeURIComponent(contentToSend);
+  if (!filePath) {
+    alert('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m');
+    return;
+  }
   
-  // Get current IDE preference
-  const currentIDE = getSelectedIDE();
-  const uriScheme = currentIDE === 'cursor' ? 'cursor' : 'vscode';
-  const uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
-  
-  window.open(uri, '_self');
+  try {
+    await navigator.clipboard.writeText(fullCode);
+    
+    const encodedPath = encodeURIComponent(filePath);
+    const currentIDE = getSelectedIDE();
+    const uriScheme = currentIDE === 'cursor' ? 'cursor' : 'vscode';
+    
+    let uri;
+    if (fullCode.length > 1000) {
+      // Uzun content - sadece clipboard kullan
+      uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}`;
+      console.log(`🚀 URI (${uriScheme}) açılıyor (clipboard mode): ${filePath} - ${fullCode.length} karakter`);
+    } else {
+      // Kısa content - URI'ye content ekle
+      const encodedContent = encodeURIComponent(fullCode);
+      uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
+      console.log(`🚀 URI (${uriScheme}) açılıyor (URI mode): ${filePath} - ${fullCode.length} karakter`);
+    }
+    
+    window.open(uri, '_self');
+
+    const iconSpan = button.querySelector('.material-symbols-outlined');
+    if (iconSpan) {
+        button.disabled = true;
+        iconSpan.textContent = 'check';
+
+        setTimeout(() => {
+          iconSpan.innerHTML = window.ICONS.vscode;
+          button.disabled = false;
+        }, 2000);
+    }
+  } catch (error) {
+    console.error('❌ URI açma veya panoya kopyalama hatası:', error);
+    alert('İşlem başarısız: ' + error.message + '\n\nTarayıcı konsolunu kontrol edin (F12).');
+  }
 }
 
 function addSelectedTextToStages(selectedText) {

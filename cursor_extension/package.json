@@ -24,6 +24,7 @@
     "url": "https://github.com/aistudio/copy-helper"
   },
   "activationEvents": [
+    "onUri",
     "*"
   ],
   "main": "./dist/extension.js",
@@ -47,10 +48,10 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
+    "vscode:prepublish": "npm run compile",
     "compile": "npm run esbuild-base -- --minify",
     "watch": "npm run esbuild-base -- --watch",
-    "package": "npm run esbuild-base -- --minify",
+    "package": "npx vsce package",
     "esbuild-base": "esbuild ./extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "lint": "eslint . --ext .ts"
   },

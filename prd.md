@@ -5,6 +5,13 @@
 
 ## 1. Giriş ve Amaç
 
+sırayla bunları çalıştırın:
+cd cursor_extension
+npm install
+npm run compile
+npm run package
+code --install-extension "aistudiocopy-0.2.1.vsix"
+
 Bu belge, Google AI Studio için geliştirilen "Plan Yöneticisi" Chrome uzantısının ürün gereksinimlerini tanımlar. Ürünün temel amacı, Google AI Studio'da karmaşık ve çok adımlı görevleri planlama, yönetme ve yürütme sürecini basitleştirerek kullanıcı verimliliğini artırmaktır. Mevcut arayüzde eksik olan bu planlama katmanı, kullanıcıların prompt'larını daha yapılandırılmış bir şekilde geliştirmelerine olanak tanıyacaktır.
 
 ## 2. Hedef Kitle

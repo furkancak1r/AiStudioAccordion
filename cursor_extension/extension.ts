@@ -3,6 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 function cleanMarkdownCodeBlocks(content: string): string {
+	// Eğer içerik markdown kod bloğu değilse, olduğu gibi döndür
+	if (!content.includes('```')) {
+		return content;
+	}
+	
 	const lines = content.split(/\r?\n/);
 	
 	const firstLineIndex = lines.findIndex(line => line.trim().length > 0);
@@ -30,32 +35,26 @@ function cleanMarkdownCodeBlocks(content: string): string {
 
 async function handleUri(uri: vscode.Uri) {
 	try {
-		console.log('🚀 URI received:', uri.toString());
-		vscode.window.showInformationMessage(`URI alındı: ${uri.toString()}`);
-		
 		const query = new URLSearchParams(uri.query);
 		const filePath = query.get('file');
-		const content = query.get('content');
-		
-		if (!filePath || !content) {
-			vscode.window.showErrorMessage('VS Code URI eksik parametreler: file ve content gerekli');
+
+		if (!filePath) {
+			const errorMsg = 'VS Code URI eksik parametre: file gerekli';
+			vscode.window.showErrorMessage(errorMsg);
 			return;
 		}
-		
-		const decodedFilePath = decodeURIComponent(filePath);
-		const decodedContent = decodeURIComponent(content);
-		
-		await handleDeepLinkContent(decodedContent, decodedFilePath);
-		
-	} catch (error) {
-		console.error('❌ URI handling error:', error);
-		vscode.window.showErrorMessage(`VS Code URI işleme hatası: ${error}`);
-	}
-}
 
-async function handleDeepLinkContent(content: string, filePath: string) {
-	try {
-		console.log('📝 Starting handleDeepLinkContent with:', { filePath, contentLength: content.length });
+		// Önce URI'den content parametresini oku, yoksa clipboard'dan
+		let content = query.get('content');
+		if (content) {
+			content = decodeURIComponent(content);
+		} else {
+			content = await vscode.env.clipboard.readText();
+			if (!content) {
+				vscode.window.showInformationMessage('Pano boş. Lütfen AI Studio\'dan kodu tekrar gönderin.');
+				return;
+			}
+		}
 		
 		const cleanedContent = cleanMarkdownCodeBlocks(content);
 		
@@ -86,15 +85,14 @@ async function handleDeepLinkContent(content: string, filePath: string) {
 		await vscode.window.showTextDocument(document);
 		
 		vscode.window.showInformationMessage(`✅ Kod ${filePath} dosyasına yazıldı ve açıldı`);
-		
+
 	} catch (error) {
-		console.error('❌ Error in handleDeepLinkContent:', error);
-		vscode.window.showErrorMessage(`Dosya yazma hatası: ${error}`);
+		vscode.window.showErrorMessage(`VS Code URI işleme hatası: ${error}`);
 	}
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('🎉 AI Studio Copy extension is ACTIVATING!');
+	vscode.window.showInformationMessage('🎯 AI Studio Copy extension activated!');
 	
 	// Status bar button ekleme
 	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -102,19 +100,15 @@ export function activate(context: vscode.ExtensionContext) {
 	statusBarItem.command = 'aistudiocopy.pasteToFile';
 	statusBarItem.tooltip = 'Paste code from clipboard to file';
 	statusBarItem.show();
-	console.log('✅ Status bar item created and shown');
 	
 	// URI handler
 	const uriHandler = vscode.window.registerUriHandler({
 		handleUri: handleUri
 	});
-	console.log('✅ URI handler registered');
 	
 	// Main command
 	const pasteCommand = vscode.commands.registerCommand('aistudiocopy.pasteToFile', async () => {
 		try {
-			console.log('🔥 Paste command executed!');
-			vscode.window.showInformationMessage('🔥 AI Studio Copy çalışıyor!');
 			
 			const clipboardContent = await vscode.env.clipboard.readText();
 			
@@ -125,14 +119,19 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const lines = clipboardContent.split(/\r?\n/);
 			const firstLine = lines[0];
-			const pathMatch = firstLine.match(/^(?:#|\/\/)\s*(.+\.\w+)/);
+			const pathMatch = firstLine.match(/^(?:\/\/\s*(.+\.\w+)|#\s*(.+\.\w+)|\/\*\s*(.+\.\w+)\s*\*\/|<!--\s*(.+\.\w+)\s*-->|--\s*(.+\.\w+)|%\s*(.+\.\w+))/);
 			
 			if (!pathMatch) {
-				vscode.window.showErrorMessage('İlk satırda dosya yolu bulunamadı.\nÖrnekler:\n// src/components/Layout.tsx\n// C:/tam/yol/Layout.tsx\n# src/utils/helper.js');
+				vscode.window.showErrorMessage('İlk satırda dosya yolu bulunamadı.\nÖrnekler:\n// src/components/Layout.tsx\n# src/utils/helper.js\n/* src/styles/app.css */\n<!-- src/templates/page.html -->\n-- src/queries/data.sql\n% src/scripts/process.m');
 				return;
 			}
 
-			const extractedPath = pathMatch[1].trim();
+			// Extract the file path from the appropriate capture group
+			const extractedPath = (pathMatch[1] || pathMatch[2] || pathMatch[3] || pathMatch[4] || pathMatch[5] || pathMatch[6] || '').trim();
+			if (!extractedPath) {
+				vscode.window.showErrorMessage('İlk satırda dosya yolu bulunamadı.\nÖrnekler:\n// src/components/Layout.tsx\n# src/utils/helper.js\n/* src/styles/app.css */\n<!-- src/templates/page.html -->\n-- src/queries/data.sql\n% src/scripts/process.m');
+				return;
+			}
 			const cleanedContent = cleanMarkdownCodeBlocks(clipboardContent);
 			
 			if (!vscode.workspace.workspaceFolders) {
@@ -162,17 +161,11 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage(`✅ Kod ${extractedPath} dosyasına yazıldı ve açıldı`);
 			
 		} catch (error) {
-			console.error('❌ Paste command error:', error);
 			vscode.window.showErrorMessage(`Dosya yazma hatası: ${error}`);
 		}
 	});
 
 	context.subscriptions.push(statusBarItem, uriHandler, pasteCommand);
-	
-	console.log('🎯 AI Studio Copy extension FULLY ACTIVATED!');
-	vscode.window.showInformationMessage('🎯 AI Studio Copy eklentisi aktif!');
 }
 
-export function deactivate() {
-	console.log('👋 AI Studio Copy extension deactivated');
-}
+export function deactivate() {}
