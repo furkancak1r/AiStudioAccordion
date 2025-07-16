@@ -191,8 +191,40 @@ if (!actionBar.closest('ms-code-block')) {
 const currentIDE = getSelectedIDE();
 const buttonTitle = currentIDE === 'cursor' ? 'Cursora Gönder' : 'VS Code\'a Gönder';
 
-const vscodeBtn = createButton('vscode', buttonTitle, sendToVscode);
-vscodeBtn.classList.add('mat-mdc-icon-button', 'mat-unthemed');
+// Create button with full Material Design structure to match native buttons
+const vscodeBtn = document.createElement('button');
+vscodeBtn.className = 'markdown-vscode-btn-fwk mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-mdc-tooltip-trigger mat-unthemed';
+vscodeBtn.setAttribute('mat-icon-button', '');
+vscodeBtn.setAttribute('title', buttonTitle);
+
+// Add ripple span (for Material Design touch feedback)
+const rippleSpan = document.createElement('span');
+rippleSpan.className = 'mat-mdc-button-persistent-ripple mdc-icon-button__ripple';
+
+// Add icon span with Material Symbols styling
+const iconSpan = document.createElement('span');
+iconSpan.setAttribute('aria-hidden', 'true');
+iconSpan.className = 'material-symbols-outlined notranslate';
+iconSpan.innerHTML = window.ICONS?.vscode || `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`;
+
+// Add focus indicator span
+const focusSpan = document.createElement('span');
+focusSpan.className = 'mat-focus-indicator';
+
+// Add touch target span
+const touchSpan = document.createElement('span');
+touchSpan.className = 'mat-mdc-button-touch-target';
+
+// Assemble button structure
+vscodeBtn.appendChild(rippleSpan);
+vscodeBtn.appendChild(iconSpan);
+vscodeBtn.appendChild(focusSpan);
+vscodeBtn.appendChild(touchSpan);
+
+// Add click handler
+vscodeBtn.onclick = (e) => {
+  sendToVscode(e);
+};
 
 actionBar.appendChild(vscodeBtn);
 actionBar.dataset.vscodeBtnInjected = '1';

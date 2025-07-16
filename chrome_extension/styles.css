@@ -335,8 +335,7 @@
 .markdown-copy-btn-fwk,
 .markdown-edit-btn-fwk,
 .markdown-delete-btn-fwk,
-.markdown-send-btn-fwk,
-.markdown-vscode-btn-fwk {
+.markdown-send-btn-fwk {
   background: transparent;
   border: none;
   border-radius: 50%;
@@ -354,8 +353,7 @@
 .markdown-copy-btn-fwk svg,
 .markdown-edit-btn-fwk svg,
 .markdown-delete-btn-fwk svg,
-.markdown-send-btn-fwk svg,
-.markdown-vscode-btn-fwk svg {
+.markdown-send-btn-fwk svg {
     width: 20px;
     height: 20px;
 }
@@ -363,8 +361,12 @@
 .markdown-copy-btn-fwk:hover, .markdown-send-btn-fwk:hover { background-color: var(--color-state-layer-primary-012, rgba(168, 201, 255, 0.12)); color: var(--color-primary, #a8c9ff); }
 .markdown-edit-btn-fwk:hover { background-color: var(--color-state-layer-tertiary-012, rgba(204, 180, 255, 0.12)); color: var(--color-tertiary, #ccb4ff); }
 .markdown-delete-btn-fwk:hover { background-color: var(--color-state-layer-error-012, rgba(242, 185, 182, 0.12)); color: var(--color-error, #f2b9b6); }
-.markdown-vscode-btn-fwk:hover { background-color: var(--color-state-layer-primary-012, rgba(168, 201, 255, 0.12)); color: var(--color-primary, #a8c9ff); }
 
+/* VS Code button uses Material Design styling exclusively */
+.markdown-vscode-btn-fwk.mdc-icon-button svg {
+  width: 16px;
+  height: 16px;
+}
 
 .markdown-copy-btn-fwk:disabled {
   background-color: var(--color-state-layer-success-012, rgba(153, 227, 153, 0.12));
