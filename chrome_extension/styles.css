@@ -516,3 +516,51 @@
 .edit-modal-actions-fwk .markdown-cancel-btn-fwk.modal-btn:hover {
     background-color: var(--color-state-layer-primary-008, rgba(168, 201, 255, 0.08));
 }
+
+/* Message truncation styles */
+.aistudio-message-truncated {
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.aistudio-message-truncated:hover {
+  opacity: 0.8;
+}
+
+.aistudio-message-truncated::after {
+  content: ' (tıkla genişlet)';
+  font-size: 0.85em;
+  color: var(--color-on-surface-variant, #c4c7c5);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-style: italic;
+}
+
+.aistudio-message-truncated:hover::after {
+  opacity: 0.7;
+}
+
+.aistudio-message-expanded {
+  cursor: pointer;
+  position: relative;
+}
+
+.aistudio-message-expanded::after {
+  content: ' (tıkla daralt)';
+  font-size: 0.85em;
+  color: var(--color-on-surface-variant, #c4c7c5);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-style: italic;
+}
+
+.aistudio-message-expanded:hover::after {
+  opacity: 0.7;
+}
+
+/* Ensure message containers have proper text handling */
+.user-prompt-container .turn-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

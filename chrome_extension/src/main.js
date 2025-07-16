@@ -125,6 +125,11 @@
   scanAndEnhanceActionBars();
   loadIDEPreference(); // Load IDE preference on startup
   
+  // Initialize message truncation
+  if (window.AIStudioMessages) {
+    window.AIStudioMessages.init();
+  }
+  
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,

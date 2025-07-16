@@ -28,6 +28,7 @@
         "src/state.js",
         "src/handlers.js",
         "src/ui.js",
+        "src/messages.js",
         "src/main.js"
       ],
       "css": [
