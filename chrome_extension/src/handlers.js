@@ -16,7 +16,7 @@ function deleteSection(index) {
 }
 
 function copySection(index) {
-  const text = "go " + detectedSections[index];
+  const text = "go " + detectedSections[index] + ", yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. \"File:\" yazma. ng-star-inserted ekleme.";
   navigator.clipboard.writeText(text).then(() => {
     const copyBtn = body.querySelector(`[data-index='${index}'] .markdown-copy-btn-fwk`);
     if (copyBtn) {
@@ -65,7 +65,7 @@ function sendToPrompt(index) {
     const text = detectedSections[index];
     if (!text) return;
   
-    const promptText = `go ${text}`;
+    const promptText = `go ${text}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
     const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
     const runButton = document.querySelector('run-button button[type="submit"]');
   
@@ -185,7 +185,7 @@ function addSelectedTextToStages(selectedText) {
 function sendSelectedTextToPrompt(selectedText) {
   if (!selectedText) return;
   
-  const promptText = `go ${selectedText}`;
+  const promptText = `go ${selectedText}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
   const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
   const runButton = document.querySelector('run-button button[type="submit"]');
   
