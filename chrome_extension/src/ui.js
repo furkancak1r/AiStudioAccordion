@@ -9,21 +9,52 @@ function truncateText(text, wordLimit = 2) {
 }
 
 function createButton(iconKey, title, onClick, extraClass = '') {
-const btn = document.createElement('button');
-btn.className = `markdown-${iconKey}-btn-fwk ${extraClass}`.trim();
-btn.innerHTML = ICONS[iconKey];
-btn.title = title;
-if (iconKey === 'vscode' || iconKey === 'git' || iconKey === 'analyze') {
-  btn.onclick = (e) => {
-    onClick(e);
-  };
-} else {
+  const btn = document.createElement('button');
+  btn.className = `markdown-${iconKey}-btn-fwk ${extraClass}`.trim();
+  btn.innerHTML = ICONS[iconKey];
+  btn.title = title;
+  if (iconKey === 'vscode' || iconKey === 'git' || iconKey === 'analyze') {
+    btn.onclick = (e) => {
+      onClick(e);
+    };
+  } else {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      onClick(e);
+    };
+  }
+  return btn;
+}
+
+function createMaterialIconButton(iconKey, title, onClick, extraClass = '') {
+  const btn = document.createElement('button');
+  btn.className = `mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-unthemed ${extraClass}`.trim();
+  btn.setAttribute('mat-icon-button', '');
+  btn.setAttribute('title', title);
+  btn.setAttribute('aria-label', title);
+
+  const rippleSpan = document.createElement('span');
+  rippleSpan.className = 'mat-mdc-button-persistent-ripple mdc-icon-button__ripple';
+
+  const iconSpan = document.createElement('span');
+  iconSpan.setAttribute('aria-hidden', 'true');
+  iconSpan.className = 'material-symbols-outlined notranslate';
+  iconSpan.innerHTML = window.ICONS?.[iconKey] || '';
+
+  const focusSpan = document.createElement('span');
+  focusSpan.className = 'mat-focus-indicator';
+
+  const touchSpan = document.createElement('span');
+  touchSpan.className = 'mat-mdc-button-touch-target';
+
+  btn.append(rippleSpan, iconSpan, focusSpan, touchSpan);
+
   btn.onclick = (e) => {
     e.stopPropagation();
     onClick(e);
   };
-}
-return btn;
+
+  return btn;
 }
 
 function createEditModal(index) {
@@ -181,7 +212,6 @@ if (isSidebarCollapsed) {
 }
 
 function createSelectionToolbar(selectedText, x, y) {
-  // Remove existing toolbar if present
   removeSelectionToolbar();
   
   const toolbar = document.createElement('div');
@@ -207,7 +237,6 @@ function createSelectionToolbar(selectedText, x, y) {
   document.body.appendChild(toolbar);
   selectionToolbar = toolbar;
   
-  // Otomatik gizlenme kaldırıldı
   return toolbar;
 }
 
@@ -226,9 +255,8 @@ function handleTextSelection() {
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
     
-    // Position toolbar at the end of selection
-    const x = rect.left + (rect.width / 2) - 50; // Center horizontally
-    const y = rect.top + window.scrollY; // Account for scroll
+    const x = rect.left + (rect.width / 2) - 50;
+    const y = rect.top + window.scrollY;
     
     lastSelectedText = selectedText;
     createSelectionToolbar(selectedText, x, y);
@@ -246,41 +274,33 @@ if (!actionBar.closest('ms-code-block')) {
   return;
 }
 
-// Get current IDE preference for button title
 const currentIDE = getSelectedIDE();
 const buttonTitle = currentIDE === 'cursor' ? 'Cursora Gönder' : 'VS Code\'a Gönder';
 
-// Create button with full Material Design structure to match native buttons
 const vscodeBtn = document.createElement('button');
 vscodeBtn.className = 'markdown-vscode-btn-fwk mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-mdc-tooltip-trigger mat-unthemed';
 vscodeBtn.setAttribute('mat-icon-button', '');
 vscodeBtn.setAttribute('title', buttonTitle);
 
-// Add ripple span (for Material Design touch feedback)
 const rippleSpan = document.createElement('span');
 rippleSpan.className = 'mat-mdc-button-persistent-ripple mdc-icon-button__ripple';
 
-// Add icon span with Material Symbols styling
 const iconSpan = document.createElement('span');
 iconSpan.setAttribute('aria-hidden', 'true');
 iconSpan.className = 'material-symbols-outlined notranslate';
 iconSpan.innerHTML = window.ICONS?.vscode || `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`;
 
-// Add focus indicator span
 const focusSpan = document.createElement('span');
 focusSpan.className = 'mat-focus-indicator';
 
-// Add touch target span
 const touchSpan = document.createElement('span');
 touchSpan.className = 'mat-mdc-button-touch-target';
 
-// Assemble button structure
 vscodeBtn.appendChild(rippleSpan);
 vscodeBtn.appendChild(iconSpan);
 vscodeBtn.appendChild(focusSpan);
 vscodeBtn.appendChild(touchSpan);
 
-// Add click handler
 vscodeBtn.onclick = (e) => {
   e.stopPropagation();
   sendToVscode(e);
@@ -291,11 +311,11 @@ actionBar.dataset.vscodeBtnInjected = '1';
 }
 
 function createGitCommitButton() {
-    return createButton('git', 'Git Komutlarını İste', sendGitCommitPrompt, 'git-commit-btn-fwk');
+    return createMaterialIconButton('git', 'Git Komutlarını İste', sendGitCommitPrompt, 'git-commit-btn-fwk');
 }
 
 function createAnalyzeFilesButton() {
-    return createButton('analyze', 'Dosyaları Analiz Et', sendAnalyzeFilesPrompt, 'analyze-files-btn-fwk');
+    return createMaterialIconButton('analyze', 'Dosyaları Analiz Et', sendAnalyzeFilesPrompt, 'analyze-files-btn-fwk');
 }
 
 function createSequentialSendButton() {
@@ -339,7 +359,6 @@ function sendStagesSequentially() {
     function sendNextStage() {
         if (currentIndex >= detectedSections.length) {
             updateButtonState(false);
-            // Tüm aşamaları sil
             detectedSections.splice(0, detectedSections.length);
             renderSections();
             showPopup('Tüm aşamalar başarıyla gönderildi!', 'success', 'İşlem Tamamlandı');
@@ -357,7 +376,6 @@ function sendStagesSequentially() {
                     sendNextStage();
                 } else {
                     updateButtonState(false);
-                    // Tüm aşamaları sil
                     detectedSections.splice(0, detectedSections.length);
                     renderSections();
                     showPopup('Tüm aşamalar başarıyla gönderildi!', 'success', 'İşlem Tamamlandı');
@@ -373,7 +391,6 @@ function sendStagesSequentially() {
 }
 
 function showPopup(message, type = 'info', title = 'Bilgi') {
-    // Mevcut popup'ları temizle
     const existingPopups = document.querySelectorAll('.ai-popup-fwk');
     existingPopups.forEach(popup => popup.remove());
 
@@ -389,7 +406,6 @@ function showPopup(message, type = 'info', title = 'Bilgi') {
     const icon = document.createElement('span');
     icon.className = 'ai-popup-icon';
     
-    // Type'a göre icon seç
     switch(type) {
         case 'success':
             icon.innerHTML = ICONS.success;
@@ -452,7 +468,6 @@ function showPopup(message, type = 'info', title = 'Bilgi') {
     
     document.body.appendChild(overlay);
     
-    // Enter tuşu ile kapatma
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' || e.key === 'Escape') {
             overlay.classList.add('fade-out');
@@ -466,7 +481,6 @@ function showPopup(message, type = 'info', title = 'Bilgi') {
     };
     document.addEventListener('keydown', handleKeyPress);
     
-    // Overlay'e tıklayarak kapatma
     overlay.onclick = (e) => {
         if (e.target === overlay) {
             overlay.classList.add('fade-out');
@@ -478,14 +492,12 @@ function showPopup(message, type = 'info', title = 'Bilgi') {
         }
     };
     
-    // Focus ok button
     setTimeout(() => {
         okBtn.focus();
     }, 100);
 }
 
 function showNotification(message, type = 'info') {
-    // Mevcut notification'ları temizle
     const existingNotifications = document.querySelectorAll('.ai-notification-fwk');
     existingNotifications.forEach(notification => notification.remove());
 
@@ -495,7 +507,6 @@ function showNotification(message, type = 'info') {
     const icon = document.createElement('span');
     icon.className = 'ai-notification-icon';
     
-    // Type'a göre icon seç
     switch(type) {
         case 'success':
             icon.innerHTML = ICONS.success;
@@ -525,7 +536,6 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Otomatik kaldırma
     setTimeout(() => {
         if (notification.parentNode) {
             notification.classList.add('fade-out');
