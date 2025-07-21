@@ -306,17 +306,7 @@ Kullanıcı “git add . git commit -m \"…\" git push kodlarını ver” dedi�
       }
     });
 
-    // Hide toolbar when clicking elsewhere
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.selection-toolbar-fwk')) {
-        removeSelectionToolbar();
-      }
-    });
-
-    // Hide toolbar on scroll
-    document.addEventListener('scroll', () => {
-      removeSelectionToolbar();
-    }, true);
+    // Scroll ve click ile toolbar'ı kaldırma kodları silindi
   }
 
   window.getSystemInstructions = function() {

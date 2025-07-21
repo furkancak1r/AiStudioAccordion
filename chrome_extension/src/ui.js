@@ -205,11 +205,7 @@ function createSelectionToolbar(selectedText, x, y) {
   document.body.appendChild(toolbar);
   selectionToolbar = toolbar;
   
-  // Auto-hide after 10 seconds
-  setTimeout(() => {
-    removeSelectionToolbar();
-  }, 10000);
-  
+  // Otomatik gizlenme kaldırıldı
   return toolbar;
 }
 
