@@ -1,5 +1,5 @@
 ```markdown
-# C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/README.md
+<!-- C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/README.md -->
 # Kod Bloğu Akordiyonu Chrome Eklentisi
 
 Bu Chrome eklentisi, Google AI Studio'da kod bloklarını daha kullanışlı hale getirir, iş akışını otomatize eder ve IDE entegrasyonu sağlar.
@@ -21,9 +21,12 @@ Bu Chrome eklentisi, Google AI Studio'da kod bloklarını daha kullanışlı hal
 - **Git Komutları:** Tek tıkla standart `git add/commit/push` komut istemini gönderir.
 - **Dosya Analizi:** Mevcut prompt'un sonuna, proje dosyalarını analiz etme istemi ekler ve gönderir.
 
-### 🎯 IDE Entegrasyonu
+### 🎯 Akıllı IDE Entegrasyonu
 - Cursor ve Visual Studio Code desteği.
-- Kod bloklarındaki "VS Code'a Gönder" butonu ile kodu doğrudan seçili IDE'ye gönderir.
+- Kod bloklarındaki **"IDE'ye Gönder"** butonu, tek tıkla tüm süreci yönetir:
+  1.  Uzun kod bloklarının tamamını **otomatik olarak yükler**.
+  2.  İşlem bitince kod bloğu akordiyonunu **temiz bir görünüm için kapatır**.
+  3.  Kodun **tamamını** seçili IDE'ye gönderir.
 
 ### 📋 Plan Aşamaları Yönetimi
 - Sol panele entegre edilmiş, daraltılabilir bir "Plan Aşamaları" kenar çubuğu.
@@ -55,7 +58,7 @@ Bu Chrome eklentisi, Google AI Studio'da kod bloklarını daha kullanışlı hal
 
 ### Kod Blokları
 - Kod bloklarındaki başlık çubuğunda bulunan ▼/▲ ikonları ile kodları daraltıp genişletin.
-- "IDE'ye Gönder" butonuna tıklayarak kodu doğrudan seçili IDE'nizde açın.
+- **"IDE'ye Gönder"** butonuna tıklayarak kodu doğrudan seçili IDE'nizde açın. Eklenti, sizin için kodun tamamını yükleyip gönderecektir; manuel olarak bir şey yapmanıza gerek yoktur.
 
 ### Plan Aşamaları
 - Bir metin seçin ve görünen araç çubuğundan "+" ikonuna tıklayarak plana ekleyin.

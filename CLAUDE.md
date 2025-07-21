@@ -1,5 +1,5 @@
 ```markdown
-# C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/CLAUDE.md
+<!-- C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/CLAUDE.md -->
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -9,37 +9,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Chrome extension called "Kod Bloğu Akordiyonu" (Code Block Accordion) that enhances the AI Studio (aistudio.google.com) user experience with multiple features:
 
 1.  **Code Block Accordion**: Makes Angular `<pre>` blocks collapsible/expandable.
-2.  **Plan Stage Management**: Adds a sidebar for creating, editing, deleting, and running multi-step plans. Supports importing stages from clipboard.
-3.  **Message Truncation**: Automatically shortens long user messages to the first 10 words, expandable on click.
-4.  **Prompt Area Shortcuts**: Injects "Git Command" and "Analyze Files" buttons next to the "Run" button for one-click prompt submission.
-5.  **Automatic Model Settings**: On page load or when the settings panel is opened, it automatically enables "Thinking Budget" to its max value and sets "Media Resolution" to "Medium".
-6.  **IDE Integration**: Adds a "Send to VS Code/Cursor" button to code blocks for seamless transfer of code to a local editor via deep-links.
+2.  **Plan Stage Management**: Adds a sidebar for creating, editing, deleting, and running multi-step plans.
+3.  **Message Truncation**: Automatically shortens long user messages, expandable on click.
+4.  **Prompt Area Shortcuts**: Injects "Git Command" and "Analyze Files" buttons for one-click prompts.
+5.  **Automatic Model Settings**: Configures "Thinking Budget" and "Media Resolution" automatically.
+6.  **Smart IDE Integration**: Adds a "Send to IDE" button that automatically loads the full code content, collapses the accordion, and then sends the complete code to VS Code or Cursor.
 
 ## Architecture
 
 The extension uses a content script architecture with several IIFE (Immediately Invoked Function Expression) modules organized under `src/`:
 
--   `main.js`: The entry point. It uses a `MutationObserver` to watch for DOM changes and injects all features at the appropriate time by calling functions from other modules. It orchestrates the enhancement of the prompt area, code blocks, and model settings panel.
--   `ui.js`: Responsible for creating all UI elements, such as the sidebar, modals, and all custom buttons (`createGitCommitButton`, `createAnalyzeFilesButton`, etc.).
--   `handlers.js`: Contains all event handler logic. This includes functions for button clicks (`sendGitCommitPrompt`, `sendAnalyzeFilesPrompt`), plan stage management (add, delete, copy), and IDE integration (`sendToVscode`).
--   `state.js`: Manages the application's state, including plan stages and IDE preferences, using `sessionStorage` and `localStorage` for persistence.
--   `icons.js`: A central repository for all SVG icons used in the UI.
--   `accordion.js` & `messages.js`: Self-contained modules for the code block accordion and message truncation features, respectively.
+-   `main.js`: The entry point. Uses a `MutationObserver` to watch for DOM changes and injects all features.
+-   `ui.js`: Responsible for creating all UI elements, such as the sidebar, modals, and buttons.
+-   `handlers.js`: Contains all event handler logic. The main `sendToVscode` async function is located here.
+-   `state.js`: Manages the application's state (plan stages, IDE preferences).
+-   `icons.js`: A central repository for all SVG icons.
+-   `accordion.js`: Manages the code block accordion. Crucially, it exports helper functions like `forceLoadAndGetContent` and `collapseAccordion` via the `window.AIStudioAccordion` object for use by other modules.
+-   `messages.js`: A self-contained module for the message truncation feature.
 
 ## Key Technical Patterns
 
 ### Dynamic UI Injection via MutationObserver
-The core of the extension's logic resides in `main.js`. A single, powerful `MutationObserver` watches the entire `document.documentElement`. When specific elements (like `div.prompt-input-wrapper-container` or `ms-settings-view`) are added to the DOM, the observer triggers corresponding functions (`enhancePromptInputArea`, `configureModelSettings`) to inject new UI elements or modify existing ones.
+The core logic in `main.js` uses a `MutationObserver` to watch the DOM. When specific elements (like `div.prompt-input-wrapper-container` or `ms-settings-view`) are added, the observer triggers corresponding functions to inject new UI or modify settings.
 
-### Programmatic Control of Angular Material Components
-The `configureModelSettings` function in `main.js` demonstrates how to control complex, third-party components. It programmatically simulates user clicks (`element.click()`) and dispatches `input` and `change` events to ensure that Angular's change detection recognizes the new values for components like `mat-slide-toggle` and `mat-select`.
+### Smart IDE Integration via Async Workflow
+The "Send to IDE" feature is a key example of inter-module communication and asynchronous control flow:
+1.  The user clicks the button, triggering the `async sendToVscode` function in `handlers.js`.
+2.  `sendToVscode` calls `await window.AIStudioAccordion.forceLoadAndGetContent(...)`. This function, located in `accordion.js`, programmatically scrolls the `<pre>` element to trigger AI Studio's lazy loading until all content is present in the DOM. It returns a promise that resolves with the full code content.
+3.  After the content is loaded, `sendToVscode` calls `window.AIStudioAccordion.collapseAccordion()` to reset the UI.
+4.  Finally, `sendToVscode` uses the fully loaded code to construct and open the `vscode://` or `cursor://` URI.
+5.  Visual feedback (loading icon, success checkmark) is provided to the user throughout this process.
 
-### Prompt Area Enhancement
-The `enhancePromptInputArea` function is called by the observer to inject custom buttons. It creates wrappers for the new buttons and inserts them before the "Run" button's wrapper, ensuring a consistent layout. It uses a `dataset` flag (`data-prompt-enhanced`) to prevent re-injection.
-
-### State Management
--   `sessionStorage` is used for non-critical session data like plan stages (`markdownCache`).
--   `localStorage` (via `chrome.storage.local`) is used for persistent user settings like `selectedIDE` and `systemInstructions`.
+### Module Communication
+Modules communicate primarily through a global `window` object (`window.AIStudioAccordion`) which exposes an API from the `accordion.js` module to the `handlers.js` module. This allows for clean separation of concerns, where `accordion.js` handles the DOM manipulation of the accordion, and `handlers.js` handles the user interaction logic.
 
 ## Development Commands
 
@@ -52,13 +54,13 @@ The `enhancePromptInputArea` function is called by the observer to inject custom
 ```
 
 ### Testing
+-   Test the "Send to IDE" button on a very long code block that requires scrolling. Verify the full content arrives in the IDE.
 -   Test all buttons in the prompt area (Git, Analyze).
 -   Open the model settings panel to verify that "Thinking Budget" and "Media Resolution" are set automatically.
--   Use the Plan Stage sidebar to add, edit, and send stages.
--   Use the "Send to IDE" button on code blocks.
+-   Use the Plan Stage sidebar to manage and send stages.
 
 ## CSS Classes
 Key CSS classes for new features:
--   `.git-commit-btn-fwk`: The Git command shortcut button.
--   `.analyze-files-btn-fwk`: The file analysis shortcut button.
+-   `.markdown-vscode-btn-fwk.processing`: Used for the spinning loading animation on the IDE button.
+-   `.kod-blok-akordiyon-sarmalayici`: The wrapper for each collapsible code block.
 ```
