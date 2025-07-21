@@ -1,19 +1,70 @@
-// accordion.js - Code block accordion functionality (based on working old version)
-
+// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/accordion.js
 (function() {
     'use strict';
 
     let uniqueIdCounter = 0;
+
+    function forceLoadAndGetContent(preElement, buttonElement) {
+        return new Promise((resolve) => {
+            const wrapper = preElement.closest('.kod-blok-akordiyon-sarmalayici');
+            if (!wrapper) {
+                resolve(preElement.textContent || '');
+                return;
+            }
     
-    // Process a single pre element
+            buttonElement.classList.add('processing');
+            buttonElement.disabled = true;
+    
+            const wasCollapsed = preElement.classList.contains('kod-blok-icerik-kapali');
+            if (wasCollapsed) {
+                preElement.classList.add('kod-blok-icerik-acik');
+                preElement.classList.remove('kod-blok-icerik-kapali');
+            }
+    
+            let lastScrollHeight = 0;
+            const scrollInterval = setInterval(() => {
+                preElement.scrollTop = preElement.scrollHeight;
+    
+                if (preElement.scrollHeight === lastScrollHeight) {
+                    clearInterval(scrollInterval);
+                    const fullContent = preElement.textContent || '';
+                    
+                    buttonElement.classList.remove('processing');
+                    
+                    resolve(fullContent);
+                } else {
+                    lastScrollHeight = preElement.scrollHeight;
+                }
+            }, 100);
+        });
+    }
+
+    function collapseAccordion(preElement) {
+        const wrapper = preElement.closest('.kod-blok-akordiyon-sarmalayici');
+        if (!wrapper) return;
+
+        const toggleButton = wrapper.querySelector('.kod-blok-akordiyon-dugme');
+        const closeBtn = wrapper.querySelector('.kod-blok-bottom-dugme');
+
+        preElement.classList.remove('kod-blok-icerik-acik');
+        preElement.classList.add('kod-blok-icerik-kapali');
+        preElement.scrollTop = 0;
+
+        if (toggleButton) {
+            toggleButton.textContent = '▼';
+            toggleButton.setAttribute('aria-expanded', 'false');
+            toggleButton.setAttribute('title', 'Kodu Genişlet');
+        }
+        if (closeBtn) {
+            closeBtn.style.display = 'none';
+        }
+    }
+    
     function processPreElement(preElement) {
-        // Skip if element doesn't exist or doesn't have attributes
         if (!preElement || !preElement.attributes) return;
         
-        // Skip if already processed
         if (preElement.classList.contains('kod-blok-akordiyon-islendi')) return;
         
-        // Check for _ngcontent-ng-c attributes (AI Studio specific)
         let hasNgContent = false;
         for (const attr of preElement.attributes) {
             if (attr.name.startsWith('_ngcontent-ng-c')) {
@@ -23,17 +74,14 @@
         }
         if (!hasNgContent) return;
 
-        // Generate unique ID for this pre element
         uniqueIdCounter++;
         const preId = `kod-blok-icerik-${uniqueIdCounter}`;
         preElement.id = preId;
 
-        // Create wrapper div
         const wrapper = document.createElement('div');
         wrapper.classList.add('kod-blok-akordiyon-sarmalayici');
-        wrapper.style.position = 'relative'; // Ensure positioning for buttons
+        wrapper.style.position = 'relative';
 
-        // Create top toggle button
         const toggleButton = document.createElement('button');
         toggleButton.classList.add('kod-blok-akordiyon-dugme');
         toggleButton.textContent = '▼';
@@ -41,59 +89,42 @@
         toggleButton.setAttribute('aria-controls', preId);
         toggleButton.setAttribute('title', 'Kodu Genişlet');
 
-        // Create bottom close button
         const closeBtn = document.createElement('button');
         closeBtn.classList.add('kod-blok-bottom-dugme');
         closeBtn.textContent = '▲';
         closeBtn.setAttribute('title', 'Kodu Kapat');
-        closeBtn.style.display = 'none'; // Hidden by default
+        closeBtn.style.display = 'none';
 
-        // Insert wrapper before pre element
         preElement.parentNode.insertBefore(wrapper, preElement);
         
-        // Build structure: wrapper > [toggleButton, preElement, closeBtn]
         wrapper.appendChild(toggleButton);
         wrapper.appendChild(preElement);
         wrapper.appendChild(closeBtn);
 
-        // Set initial state - collapsed
         preElement.classList.add('kod-blok-icerik-kapali');
-        preElement.classList.add('kod-blok-akordiyon-islendi'); // Mark as processed
+        preElement.classList.add('kod-blok-akordiyon-islendi');
 
-        // Collapse function
         function collapse() {
-            preElement.classList.remove('kod-blok-icerik-acik');
-            preElement.classList.add('kod-blok-icerik-kapali');
-            toggleButton.textContent = '▼';
-            toggleButton.setAttribute('aria-expanded', 'false');
-            toggleButton.setAttribute('title', 'Kodu Genişlet');
-            closeBtn.style.display = 'none';
-            
-            // Smooth scroll to top of element
-            preElement.scrollIntoView({ 
+            collapseAccordion(preElement);
+            wrapper.scrollIntoView({ 
                 behavior: 'smooth', 
-                block: 'start' 
+                block: 'nearest' 
             });
         }
 
-        // Top button click handler - toggle expand/collapse
         toggleButton.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            // Toggle the expanded state
             const isExpanded = preElement.classList.toggle('kod-blok-icerik-acik');
             preElement.classList.toggle('kod-blok-icerik-kapali', !isExpanded);
             
-            // Update button appearance and state
-            toggleButton.textContent = isExpanded ? '▲' : '▼';
-            toggleButton.setAttribute('aria-expanded', String(isExpanded));
-            toggleButton.setAttribute('title', isExpanded ? 'Kodu Daralt' : 'Kodu Genişlet');
+            this.textContent = isExpanded ? '▲' : '▼';
+            this.setAttribute('aria-expanded', String(isExpanded));
+            this.setAttribute('title', isExpanded ? 'Kodu Daralt' : 'Kodu Genişlet');
             
-            // Show/hide bottom button
             closeBtn.style.display = isExpanded ? 'block' : 'none';
             
-            // If expanding, scroll to show the content
             if (isExpanded) {
                 preElement.scrollIntoView({ 
                     behavior: 'smooth', 
@@ -103,7 +134,6 @@
             }
         });
 
-        // Bottom button click handler - always collapse
         closeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -111,27 +141,21 @@
         });
     }
 
-    // Process all existing pre elements
     function processAllPreElements() {
         document.querySelectorAll('pre').forEach(processPreElement);
     }
 
-    // Initialize accordion functionality
     function init() {
-        // Process existing pre elements
         processAllPreElements();
 
-        // Set up mutation observer to handle dynamically added elements
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(function(node) {
                         if (node.nodeType === Node.ELEMENT_NODE) {
-                            // Check if the added node is a pre element
                             if (node.tagName === 'PRE') {
                                 processPreElement(node);
                             }
-                            // Check if the added node contains pre elements
                             else if (node.querySelectorAll) {
                                 node.querySelectorAll('pre').forEach(processPreElement);
                             }
@@ -141,26 +165,24 @@
             });
         });
 
-        // Start observing
         observer.observe(document.documentElement, {
             childList: true,
             subtree: true
         });
     }
 
-    // Cleanup function
     function cleanup() {
-        // Remove processed class from all elements for re-processing if needed
         document.querySelectorAll('.kod-blok-akordiyon-islendi').forEach(function(element) {
             element.classList.remove('kod-blok-akordiyon-islendi');
         });
     }
 
-    // Export functions to global scope
     window.AIStudioAccordion = {
         init: init,
         cleanup: cleanup,
-        processAllPreElements: processAllPreElements
+        processAllPreElements: processAllPreElements,
+        forceLoadAndGetContent: forceLoadAndGetContent,
+        collapseAccordion: collapseAccordion
     };
 
 })();

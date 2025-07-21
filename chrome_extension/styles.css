@@ -237,12 +237,10 @@
   padding-bottom: 0;
 }
 
-/* Navbar collapsed mode - hide sidebar and show navbar icon */
 .markdown-sidebar-fwk.navbar-collapsed {
   display: none;
 }
 
-/* Plan Aşamaları navbar icon styling - matches native navbar items exactly */
 .plan-stages-navbar-item {
   display: none;
 }
@@ -251,7 +249,6 @@
   display: flex;
 }
 
-/* Selection Toolbar Styles */
 .selection-toolbar-fwk {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #e0e0e0;
@@ -309,7 +306,6 @@
   color: #1976d2;
 }
 
-/* Selection Feedback */
 .selection-feedback-fwk {
   background: #4caf50;
   color: white;
@@ -442,10 +438,13 @@
 .markdown-edit-btn-fwk:hover { background-color: var(--color-state-layer-tertiary-012, rgba(204, 180, 255, 0.12)); color: var(--color-tertiary, #ccb4ff); }
 .markdown-delete-btn-fwk:hover { background-color: var(--color-state-layer-error-012, rgba(242, 185, 182, 0.12)); color: var(--color-error, #f2b9b6); }
 
-/* VS Code button uses Material Design styling exclusively */
 .markdown-vscode-btn-fwk.mdc-icon-button svg {
   width: 16px;
   height: 16px;
+}
+
+.markdown-vscode-btn-fwk.processing {
+  animation: spin 1s linear infinite;
 }
 
 .markdown-copy-btn-fwk:disabled {
@@ -602,7 +601,6 @@
     background-color: var(--color-state-layer-primary-008, rgba(168, 201, 255, 0.08));
 }
 
-/* Message truncation styles */
 .aistudio-message-truncated {
   cursor: pointer;
   position: relative;
@@ -644,13 +642,11 @@
   opacity: 0.7;
 }
 
-/* Ensure message containers have proper text handling */
 .user-prompt-container .turn-content {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-/* Git Commit Button Styles */
 .git-commit-btn-fwk.mdc-icon-button,
 .analyze-files-btn-fwk.mdc-icon-button {
     width: 36px !important;
@@ -826,7 +822,6 @@
   }
 }
 
-/* Popup Styles */
 .ai-popup-overlay-fwk {
   position: fixed;
   top: 0;

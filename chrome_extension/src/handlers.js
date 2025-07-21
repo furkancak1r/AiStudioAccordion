@@ -360,30 +360,42 @@ async function sendToVscode(event) {
     return;
   }
   
-  const codeElement = codeBlockElement.querySelector('code');
-  if (!codeElement) {
-    showPopup('Kod içeriği bulunamadı.', 'warning', 'Uyarı');
+  const preElement = codeBlockElement.querySelector('pre');
+  if (!preElement) {
+    showPopup('Kod içeriği bulunamadı (`pre` etiketi).', 'warning', 'Uyarı');
     return;
   }
+  
+  const iconSpan = button.querySelector('.material-symbols-outlined');
+  const originalIconHTML = iconSpan ? iconSpan.innerHTML : '';
 
-  const fullCode = codeElement.textContent || '';
-  const lines = fullCode.split('\n');
-  const firstLine = lines[0].trim();
-
-  const pathMatch = firstLine.match(/^(?:\/\/\s*(.*)|#\s*(.*)|\/\*\s*(.*?)\s*\*\/|<!--\s*(.*?)\s*-->|--\s*(.*)|%\s*(.*))/);
-  if (!pathMatch) {
-    showPopup('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning', 'Dosya Yolu Hatası');
-    return;
-  }
-  
-  const filePath = (pathMatch[1] || pathMatch[2] || pathMatch[3] || pathMatch[4] || pathMatch[5] || pathMatch[6] || '').trim();
-  
-  if (!filePath) {
-    showPopup('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning', 'Dosya Yolu Hatası');
-    return;
-  }
-  
   try {
+    if (iconSpan) iconSpan.textContent = 'sync';
+    
+    const fullCode = await window.AIStudioAccordion.forceLoadAndGetContent(preElement, button);
+    
+    window.AIStudioAccordion.collapseAccordion(preElement);
+    
+    const lines = fullCode.split('\n');
+    const firstLine = lines[0].trim();
+
+    const pathMatch = firstLine.match(/^(?:\/\/\s*(.*)|#\s*(.*)|\/\*\s*(.*?)\s*\*\/|<!--\s*(.*?)\s*-->|--\s*(.*)|%\s*(.*))/);
+    if (!pathMatch) {
+      showPopup('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning', 'Dosya Yolu Hatası');
+      button.disabled = false;
+      if (iconSpan) iconSpan.innerHTML = originalIconHTML;
+      return;
+    }
+    
+    const filePath = (pathMatch[1] || pathMatch[2] || pathMatch[3] || pathMatch[4] || pathMatch[5] || pathMatch[6] || '').trim();
+    
+    if (!filePath) {
+      showPopup('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning', 'Dosya Yolu Hatası');
+      button.disabled = false;
+      if (iconSpan) iconSpan.innerHTML = originalIconHTML;
+      return;
+    }
+    
     await navigator.clipboard.writeText(fullCode);
     
     const encodedPath = encodeURIComponent(filePath);
@@ -402,19 +414,19 @@ async function sendToVscode(event) {
     
     window.open(uri, '_self');
 
-    const iconSpan = button.querySelector('.material-symbols-outlined');
     if (iconSpan) {
-        button.disabled = true;
         iconSpan.textContent = 'check';
 
         setTimeout(() => {
-          iconSpan.innerHTML = window.ICONS.vscode;
+          iconSpan.innerHTML = originalIconHTML;
           button.disabled = false;
         }, 2000);
     }
   } catch (error) {
     console.error('❌ URI açma veya panoya kopyalama hatası:', error);
     showPopup('İşlem başarısız: ' + error.message + '\n\nTarayıcı konsolunu kontrol edin (F12).', 'error', 'Hata');
+    button.disabled = false;
+    if (iconSpan) iconSpan.innerHTML = originalIconHTML;
   }
 }
 
