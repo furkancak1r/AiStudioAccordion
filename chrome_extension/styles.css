@@ -653,3 +653,29 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+/* Git Commit Button Styles */
+.git-commit-btn-fwk {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--color-on-surface-variant, #c4c7c5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.git-commit-btn-fwk:hover {
+  background-color: var(--color-state-layer-on-surface-008, rgba(227, 227, 227, 0.08));
+  color: var(--color-on-surface, #e3e3e3);
+}
+
+.git-commit-btn-fwk svg {
+    width: 20px;
+    height: 20px;
+}

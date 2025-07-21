@@ -1,3 +1,4 @@
+// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/ui.js
 function truncateText(text, wordLimit = 2) {
   if (!text) return '';
   const words = text.split(' ');
@@ -12,7 +13,7 @@ const btn = document.createElement('button');
 btn.className = `markdown-${iconKey}-btn-fwk ${extraClass}`.trim();
 btn.innerHTML = ICONS[iconKey];
 btn.title = title;
-if (iconKey === 'vscode') {
+if (iconKey === 'vscode' || iconKey === 'git') {
   btn.onclick = (e) => {
     onClick(e);
   };
@@ -289,4 +290,8 @@ vscodeBtn.onclick = (e) => {
 
 actionBar.appendChild(vscodeBtn);
 actionBar.dataset.vscodeBtnInjected = '1';
+}
+
+function createGitCommitButton() {
+    return createButton('git', 'Git Komutlarını İste', sendGitCommitPrompt, 'git-commit-btn-fwk');
 }

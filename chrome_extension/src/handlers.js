@@ -1,3 +1,4 @@
+// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/handlers.js
 function addSection(content = '', startEditing = false) {
   if (isSidebarCollapsed) {
     toggleSidebar();
@@ -91,6 +92,26 @@ async function sendToPrompt(index) {
       console.error('Prompt textarea veya run butonu bulunamadı.');
     }
 }
+
+async function sendGitCommitPrompt() {
+    const promptText = 'git add . git commit -m "" git push kodlarını ver';
+    const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
+    const runButton = document.querySelector('run-button button[type="submit"]');
+
+    if (textarea && runButton) {
+        textarea.value = promptText;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        setTimeout(() => {
+            if (!runButton.disabled) {
+                runButton.click();
+            }
+        }, 100);
+    } else {
+        console.error('Prompt textarea veya run butonu bulunamadı.');
+    }
+}
+
 
 async function sendToVscode(event) {
   console.log('🚀 sendToVscode started');

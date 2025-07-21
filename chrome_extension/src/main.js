@@ -1,7 +1,34 @@
-// chrome_extension/src/main.js
+// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/main.js
 ;(() => {
   function scanAndEnhanceActionBars() {
     document.querySelectorAll('div.actions').forEach(enhanceActionBarWithVscodeButton);
+  }
+
+  function enhancePromptInputWithGitButton(container) {
+    if (!container || container.dataset.gitBtnInjected === '1') {
+      return;
+    }
+
+    const runButtonWrapper = container.querySelector('run-button');
+    if (!runButtonWrapper) {
+      return;
+    }
+
+    const gitButton = createGitCommitButton();
+    const gitButtonWrapper = document.createElement('div');
+    gitButtonWrapper.className = 'button-wrapper';
+    gitButtonWrapper.appendChild(gitButton);
+    
+    // run-button'ın parent'ı olan .button-wrapper'ın önüne ekle
+    const runButtonParentWrapper = runButtonWrapper.closest('.button-wrapper');
+    if (runButtonParentWrapper) {
+      container.insertBefore(gitButtonWrapper, runButtonParentWrapper);
+      container.dataset.gitBtnInjected = '1';
+    }
+  }
+
+  function scanAndEnhancePromptInputs() {
+    document.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputWithGitButton);
   }
 
   function initializeSidebar() {
@@ -212,12 +239,19 @@
         } else if (node.querySelectorAll) {
           node.querySelectorAll('div.actions').forEach(enhanceActionBarWithVscodeButton);
         }
+
+        if (node.matches && node.matches('div.prompt-input-wrapper-container')) {
+          enhancePromptInputWithGitButton(node);
+        } else if (node.querySelectorAll) {
+          node.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputWithGitButton);
+        }
       });
     });
   });
 
   initializeSidebar();
   scanAndEnhanceActionBars();
+  scanAndEnhancePromptInputs();
   loadIDEPreference(); // Load IDE preference on startup
   setupTextSelectionListener(); // Setup text selection listener
   setupSystemInstructionsObserver(); // Setup system instructions observer
