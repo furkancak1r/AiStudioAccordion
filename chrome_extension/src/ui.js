@@ -160,7 +160,9 @@ importBtn.innerHTML = ICONS.clipboard;
 importBtn.title = 'Panodan İçe Aktar';
 importBtn.onclick = importFromClipboard;
 
-footer.append(importBtn);
+const sequentialBtn = createSequentialSendButton();
+
+footer.append(importBtn, sequentialBtn);
 sidebar.append(header, body, footer);
 
 const historyElement = document.querySelector('ms-prompt-history');
@@ -294,4 +296,132 @@ function createGitCommitButton() {
 
 function createAnalyzeFilesButton() {
     return createButton('analyze', 'Dosyaları Analiz Et', sendAnalyzeFilesPrompt, 'analyze-files-btn-fwk');
+}
+
+function createSequentialSendButton() {
+    const btn = document.createElement('button');
+    btn.className = 'markdown-sequential-send-btn-fwk';
+    btn.innerHTML = ICONS.sequential;
+    btn.title = 'Aşamaları Sırayla Gönder';
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        sendStagesSequentially();
+    };
+    return btn;
+}
+
+function sendStagesSequentially() {
+    if (detectedSections.length === 0) {
+        showNotification('Gönderilecek aşama bulunamadı!', 'warning');
+        return;
+    }
+
+    const button = document.querySelector('.markdown-sequential-send-btn-fwk');
+    if (!button) return;
+
+    let currentIndex = 0;
+    let isProcessing = false;
+
+    function updateButtonState(processing, text = '') {
+        if (processing) {
+            button.disabled = true;
+            button.classList.add('processing');
+            button.innerHTML = ICONS.loading;
+            button.title = text || 'Gönderiliyor...';
+        } else {
+            button.disabled = false;
+            button.classList.remove('processing');
+            button.innerHTML = ICONS.sequential;
+            button.title = 'Aşamaları Sırayla Gönder';
+        }
+    }
+
+    function sendNextStage() {
+        if (currentIndex >= detectedSections.length) {
+            updateButtonState(false);
+            // Tüm aşamaları sil
+            detectedSections.splice(0, detectedSections.length);
+            renderSections();
+            showNotification('Tüm aşamalar başarıyla gönderildi!', 'success');
+            return;
+        }
+
+        const stage = detectedSections[currentIndex];
+        updateButtonState(true, `Aşama ${currentIndex + 1}/${detectedSections.length} gönderiliyor...`);
+
+        sendToPrompt(currentIndex, true).then(() => {
+            currentIndex++;
+            
+            setTimeout(() => {
+                if (currentIndex < detectedSections.length) {
+                    sendNextStage();
+                } else {
+                    updateButtonState(false);
+                    // Tüm aşamaları sil
+                    detectedSections.splice(0, detectedSections.length);
+                    renderSections();
+                    showNotification('Tüm aşamalar başarıyla gönderildi!', 'success');
+                }
+            }, 2000);
+        }).catch(() => {
+            updateButtonState(false);
+            showNotification(`Aşama ${currentIndex + 1} gönderilirken hata oluştu!`, 'error');
+        });
+    }
+
+    sendNextStage();
+}
+
+function showNotification(message, type = 'info') {
+    // Mevcut notification'ları temizle
+    const existingNotifications = document.querySelectorAll('.ai-notification-fwk');
+    existingNotifications.forEach(notification => notification.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `ai-notification-fwk ai-notification-${type}`;
+    
+    const icon = document.createElement('span');
+    icon.className = 'ai-notification-icon';
+    
+    // Type'a göre icon seç
+    switch(type) {
+        case 'success':
+            icon.innerHTML = ICONS.success;
+            break;
+        case 'error':
+            icon.innerHTML = ICONS.error;
+            break;
+        case 'warning':
+            icon.innerHTML = ICONS.warning;
+            break;
+        default:
+            icon.innerHTML = ICONS.info;
+    }
+    
+    const text = document.createElement('span');
+    text.className = 'ai-notification-text';
+    text.textContent = message;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'ai-notification-close';
+    closeBtn.innerHTML = ICONS.close;
+    closeBtn.onclick = () => notification.remove();
+    
+    notification.appendChild(icon);
+    notification.appendChild(text);
+    notification.appendChild(closeBtn);
+    
+    document.body.appendChild(notification);
+    
+    // Otomatik kaldırma
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
 }

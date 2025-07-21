@@ -54,17 +54,17 @@ async function importFromClipboard() {
         toggleSidebar();
       }
     } else {
-      alert('Pano boş.');
+      showNotification('Pano boş.', 'warning');
     }
   } catch (err) {
     console.error('Pano okuma hatası:', err);
-    alert('Panoya erişilemedi veya izin verilmedi.');
+    showNotification('Panoya erişilemedi veya izin verilmedi.', 'error');
   }
 }
 
-async function sendToPrompt(index) {
+async function sendToPrompt(index, sequential = false) {
     const text = detectedSections[index];
-    if (!text) return;
+    if (!text) return Promise.resolve();
   
     const systemInstructions = await getSystemInstructions();
     let promptText = `go ${text}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
@@ -80,17 +80,145 @@ async function sendToPrompt(index) {
       textarea.value = promptText;
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
       
-      setTimeout(() => {
-        if (!runButton.disabled) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (!runButton.disabled) {
             runButton.click();
-            // Plan aşamasını listeden sil
-            detectedSections.splice(index, 1);
-            renderSections();
-        }
-      }, 100);
+            
+            if (!sequential) {
+              // Tekil gönderimde aşamayı sil
+              detectedSections.splice(index, 1);
+              renderSections();
+              resolve();
+            } else {
+              // Sequential gönderimde AI'ın yanıt vermesini bekle
+              waitForAIResponse().then(() => {
+                resolve();
+              }).catch((error) => {
+                console.error('AI yanıt bekleme hatası:', error);
+                reject(error);
+              });
+            }
+          } else {
+            reject(new Error('Run button disabled'));
+          }
+        }, 100);
+      });
     } else {
       console.error('Prompt textarea veya run butonu bulunamadı.');
+      return Promise.reject(new Error('Prompt elements not found'));
     }
+}
+
+function waitForAIResponse() {
+    return new Promise((resolve, reject) => {
+        let attempts = 0;
+        const maxAttempts = 120; // 2 dakika bekle
+        const checkInterval = 500; // Her 500ms kontrol et
+        let responseDetected = false;
+        
+        // Run button'ın durumunu izle
+        const checkForResponse = () => {
+            attempts++;
+            
+            if (responseDetected) {
+                return;
+            }
+            
+            // Run button'ı bul
+            const runButton = document.querySelector('run-button button[type="submit"]');
+            
+            if (runButton) {
+                // Button disabled ve "Run" yazıyor mu kontrol et
+                const isDisabled = runButton.hasAttribute('disabled') || runButton.getAttribute('aria-disabled') === 'true';
+                const buttonLabel = runButton.querySelector('.label');
+                const labelText = buttonLabel ? buttonLabel.textContent.trim() : '';
+                
+                // Button class'larını kontrol et
+                const hasDisabledClass = runButton.classList.contains('disabled');
+                const hasNoTimerClass = runButton.classList.contains('no-timer');
+                
+                // Typing indicator yok mu kontrol et
+                const isTyping = document.querySelector('div[data-testid="typing-indicator"]');
+                
+                // AI yanıt verdi: button disabled, "Run" yazıyor, typing yok ve disabled class var
+                if (isDisabled && labelText === 'Run' && !isTyping && hasDisabledClass && !responseDetected) {
+                    responseDetected = true;
+                    console.log('AI yanıt verdi, devam ediliyor...');
+                    
+                    setTimeout(() => {
+                        resolve();
+                    }, 2000);
+                    return;
+                }
+            }
+            
+            // Timeout kontrolü
+            if (attempts >= maxAttempts) {
+                console.warn('AI yanıt timeout, devam ediliyor...');
+                resolve(); // Timeout olsa bile devam et
+                return;
+            }
+            
+            setTimeout(checkForResponse, checkInterval);
+        };
+        
+        checkForResponse();
+    });
+}
+
+function showNotification(message, type = 'info') {
+    // Mevcut notification'ları temizle
+    const existingNotifications = document.querySelectorAll('.ai-notification-fwk');
+    existingNotifications.forEach(notification => notification.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `ai-notification-fwk ai-notification-${type}`;
+    
+    const icon = document.createElement('span');
+    icon.className = 'ai-notification-icon';
+    
+    // Type'a göre icon seç
+    switch(type) {
+        case 'success':
+            icon.innerHTML = ICONS.success;
+            break;
+        case 'error':
+            icon.innerHTML = ICONS.error;
+            break;
+        case 'warning':
+            icon.innerHTML = ICONS.warning;
+            break;
+        default:
+            icon.innerHTML = ICONS.info;
+    }
+    
+    const text = document.createElement('span');
+    text.className = 'ai-notification-text';
+    text.textContent = message;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'ai-notification-close';
+    closeBtn.innerHTML = ICONS.close;
+    closeBtn.onclick = () => notification.remove();
+    
+    notification.appendChild(icon);
+    notification.appendChild(text);
+    notification.appendChild(closeBtn);
+    
+    document.body.appendChild(notification);
+    
+    // Otomatik kaldırma
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
 }
 
 async function sendGitCommitPrompt() {
@@ -138,13 +266,13 @@ async function sendToVscode(event) {
   const button = event.currentTarget;
   const codeBlockElement = button.closest('ms-code-block');
   if (!codeBlockElement) {
-    alert('İlişkili kod bloğu bulunamadı.');
+    showNotification('İlişkili kod bloğu bulunamadı.', 'warning');
     return;
   }
   
   const codeElement = codeBlockElement.querySelector('code');
   if (!codeElement) {
-    alert('Kod içeriği bulunamadı.');
+    showNotification('Kod içeriği bulunamadı.', 'warning');
     return;
   }
 
@@ -154,14 +282,14 @@ async function sendToVscode(event) {
 
   const pathMatch = firstLine.match(/^(?:\/\/\s*(.*)|#\s*(.*)|\/\*\s*(.*?)\s*\*\/|<!--\s*(.*?)\s*-->|--\s*(.*)|%\s*(.*))/);
   if (!pathMatch) {
-    alert('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m');
+    showNotification('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning');
     return;
   }
   
   const filePath = (pathMatch[1] || pathMatch[2] || pathMatch[3] || pathMatch[4] || pathMatch[5] || pathMatch[6] || '').trim();
   
   if (!filePath) {
-    alert('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m');
+    showNotification('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning');
     return;
   }
   
@@ -198,7 +326,7 @@ async function sendToVscode(event) {
     }
   } catch (error) {
     console.error('❌ URI açma veya panoya kopyalama hatası:', error);
-    alert('İşlem başarısız: ' + error.message + '\n\nTarayıcı konsolunu kontrol edin (F12).');
+    showNotification('İşlem başarısız: ' + error.message + '\n\nTarayıcı konsolunu kontrol edin (F12).', 'error');
   }
 }
 
