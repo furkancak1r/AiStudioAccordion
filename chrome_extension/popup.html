@@ -1,3 +1,4 @@
+<!-- C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/popup.html -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -22,9 +23,7 @@
                 </div>
                 <div class="ide-info">
                     <h3>Cursor</h3>
-                    <p>AI-powered code editor</p>
                 </div>
-                <div class="default-badge">Varsayılan</div>
             </button>
             
             <button class="ide-option vscode-option" data-ide="vscode">
@@ -35,13 +34,36 @@
                 </div>
                 <div class="ide-info">
                     <h3>Visual Studio Code</h3>
-                    <p>Microsoft code editor</p>
                 </div>
             </button>
         </div>
         
+        <div class="system-instructions-section">
+            <h3>🤖 Sistem Talimatları</h3>
+            <p>AI modeline gönderilecek ton ve stil talimatları</p>
+            
+            <div class="auto-apply-toggle">
+                <label class="toggle-label">
+                    <input type="checkbox" id="autoApplyToggle" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">Otomatik Uygula</span>
+                </label>
+                <span class="toggle-description">Sayfa yenilendiğinde talimatları otomatik uygula</span>
+            </div>
+            
+            <textarea 
+                id="systemInstructions" 
+                placeholder="Örnek: Kodları Türkçe açıklamalarla yaz, modern JavaScript kullan..."
+                rows="3"
+            ></textarea>
+            <div class="textarea-actions">
+                <button id="saveInstructions" class="action-btn save-btn">💾 Kaydet</button>
+                <button id="clearInstructions" class="action-btn clear-btn">🗑️ Temizle</button>
+            </div>
+        </div>
+        
         <div class="popup-footer">
-            <p class="note">Bu ayar bir kere seçilecek ve kaydedilecektir.</p>
+            <p class="note">Bu ayarlar bir kere seçilecek ve kaydedilecektir.</p>
         </div>
     </div>
     

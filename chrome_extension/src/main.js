@@ -138,6 +138,68 @@
     }, true);
   }
 
+  window.getSystemInstructions = function() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['systemInstructions'], function(result) {
+        resolve(result.systemInstructions || '');
+      });
+    });
+  };
+
+  function getAutoApplySetting() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['autoApplySystemInstructions'], function(result) {
+        resolve(result.autoApplySystemInstructions !== false); // Default to true
+      });
+    });
+  }
+
+  function applySystemInstructionsToTextarea() {
+    const systemInstructionsTextarea = document.querySelector('textarea[aria-label="System instructions"]');
+    if (!systemInstructionsTextarea) return;
+
+    Promise.all([window.getSystemInstructions(), getAutoApplySetting()]).then(([instructions, autoApply]) => {
+      if (autoApply && instructions.trim() && !systemInstructionsTextarea.value.trim()) {
+        systemInstructionsTextarea.value = instructions;
+        systemInstructionsTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+        console.log('Sistem talimatları AI Studio textarea\'sına uygulandı:', instructions);
+      } else if (!autoApply) {
+        console.log('Otomatik uygulama kapalı, sistem talimatları uygulanmadı');
+      }
+    });
+  }
+
+  function setupSystemInstructionsObserver() {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType !== 1) return;
+          
+          // Check if the added node is the system instructions textarea
+          if (node.matches && node.matches('textarea[aria-label="System instructions"]')) {
+            applySystemInstructionsToTextarea();
+          } else if (node.querySelectorAll) {
+            // Check if any child contains the system instructions textarea
+            const textarea = node.querySelector('textarea[aria-label="System instructions"]');
+            if (textarea) {
+              applySystemInstructionsToTextarea();
+            }
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Also check on page load
+    setTimeout(() => {
+      applySystemInstructionsToTextarea();
+    }, 1000);
+  }
+
   const observer = new MutationObserver((mutations) => {
     initializeSidebar();
     
@@ -158,6 +220,7 @@
   scanAndEnhanceActionBars();
   loadIDEPreference(); // Load IDE preference on startup
   setupTextSelectionListener(); // Setup text selection listener
+  setupSystemInstructionsObserver(); // Setup system instructions observer
   
   // Initialize message truncation
   if (window.AIStudioMessages) {

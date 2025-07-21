@@ -1,4 +1,4 @@
-/* popup.css */
+/* C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/popup.css */
 * {
     margin: 0;
     padding: 0;
@@ -61,16 +61,27 @@ body {
 }
 
 .ide-option:hover {
-    border-color: #4299e1;
+    border-color: #a3bffa;
     background: #ebf8ff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.1);
 }
 
 .ide-option.selected {
-    border-color: #3182ce;
-    background: #bee3f8;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    border-color: #4299e1;
+    background: #ebf8ff;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.ide-option.selected::after {
+    content: '✔';
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #4299e1;
+    font-weight: bold;
 }
 
 .ide-icon {
@@ -87,12 +98,7 @@ body {
     font-size: 16px;
     font-weight: 600;
     color: #2d3748;
-    margin-bottom: 4px;
-}
-
-.ide-info p {
-    font-size: 12px;
-    color: #718096;
+    margin-bottom: 0;
 }
 
 .default-badge {
@@ -112,6 +118,154 @@ body {
 
 .vscode-option .ide-icon {
     color: #0078d4;
+}
+
+.system-instructions-section {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.system-instructions-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.system-instructions-section p {
+    font-size: 12px;
+    color: #718096;
+    margin-bottom: 12px;
+}
+
+.auto-apply-toggle {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 4px;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: #cbd5e0;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.toggle-slider:before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider {
+    background: #48bb78;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.toggle-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.toggle-description {
+    font-size: 11px;
+    color: #718096;
+    display: block;
+    margin-left: 56px;
+    transition: color 0.3s ease;
+}
+
+#systemInstructions {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+    resize: vertical;
+    background: #ffffff;
+    color: #2d3748;
+    transition: border-color 0.2s ease;
+}
+
+#systemInstructions:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+#systemInstructions::placeholder {
+    color: #a0aec0;
+}
+
+.textarea-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-btn {
+    background: #48bb78;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #38a169;
+    transform: translateY(-1px);
+}
+
+.clear-btn {
+    background: #f56565;
+    color: white;
+}
+
+.clear-btn:hover {
+    background: #e53e3e;
+    transform: translateY(-1px);
 }
 
 .popup-footer {
@@ -153,30 +307,59 @@ body {
     }
     
     .ide-option.selected {
-        background: #1e3a8a;
-        border-color: #3b82f6;
+        background: #374151;
+        border-color: #60a5fa;
+    }
+
+    .ide-option.selected::after {
+        color: #60a5fa;
     }
     
     .ide-info h3 {
         color: #f7fafc;
     }
     
-    .ide-info p {
+    .system-instructions-section {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .system-instructions-section h3 {
+        color: #f7fafc;
+    }
+    
+    .system-instructions-section p {
         color: #a0aec0;
+    }
+    
+    .auto-apply-toggle {
+        background: #1a202c;
+        border-color: #4a5568;
+    }
+    
+    .toggle-text {
+        color: #f7fafc;
+    }
+    
+    .toggle-description {
+        color: #a0aec0;
+    }
+    
+    #systemInstructions {
+        background: #1a202c;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    #systemInstructions:focus {
+        border-color: #60a5fa;
+    }
+    
+    #systemInstructions::placeholder {
+        color: #718096;
     }
     
     .popup-footer {
         border-color: #4a5568;
     }
-}
-
-/* Animation for selection */
-@keyframes selectPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
-}
-
-.ide-option.selecting {
-    animation: selectPulse 0.3s ease-in-out;
 }

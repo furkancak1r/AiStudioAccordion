@@ -1,87 +1,92 @@
-# Kod Bloğu Akordiyonu (Dinamik) & Kod Parçacığı Kenar Çubuğu / Dynamic Code Block Accordion & Snippet Sidebar
+# Kod Bloğu Akordiyonu Chrome Eklentisi
 
-## English
+Bu Chrome eklentisi, Google AI Studio'da kod bloklarını daha kullanışlı hale getirir ve IDE entegrasyonu sağlar.
 
-**Dynamic Code Block Accordion & Snippet Sidebar** is a Chrome extension that enhances code viewing on any webpage. It now provides **three** main features:
+## Özellikler
 
-1.  **Accordion for `<pre>` blocks (Angular-specific)**
-2.  **Sidebar for triple-backtick (``` ``` ) snippets**
-3.  **Full-Code Copy button inside AI Studio’s toolbar**
+### 🤖 Sistem Talimatları
+- Eklenti popup'ında sistem talimatları metin alanı
+- AI modeline gönderilecek ton ve stil talimatları
+- localStorage'da otomatik kaydetme
+- Kaydet/Temizle butonları ile kolay yönetim
 
-### Features
+### 🎯 IDE Entegrasyonu
+- Cursor ve Visual Studio Code desteği
+- Kod bloklarını doğrudan IDE'ye gönderme
+- Deep-link entegrasyonu
 
-#### Accordion for `<pre>` blocks (Angular-specific)
-- Automatically wraps `<pre>` blocks containing Angular's `_ngcontent-ng-c` attribute with a collapsible container.
-- Toggle button (▼/▲) in the top-right of the `<pre>` block to expand/collapse.
-- Floating close button (▲) at the bottom-right of an expanded block, which also scrolls the block into view on collapse.
-- Smooth scroll animations when opening and closing.
+### 📋 Plan Aşamaları
+- Seçili metinleri plan aşamalarına ekleme
+- Sidebar'da aşamaları görüntüleme
+- Aşamaları prompt'a gönderme
 
-#### Sidebar for triple-backtick snippets
-- Adds a draggable floating button (`{}`) to toggle a dedicated sidebar.  
-  The button’s position is saved and restored across sessions.
-- Scans the entire page for code snippets enclosed in triple backticks (e.g., ```javascript … ```).
-- Lists all snippets with a short preview and a **Copy** button.
-- Clicking a snippet opens a full-code view with its own **Copy** button and a **Back to List** link.
+### 🔧 Kod Bloğu Yönetimi
+- Akordiyon tarzı kod blokları
+- Tam kod kopyalama
+- IDE'ye gönderme butonları
 
-#### Full-Code Copy button (NEW v1.4)
-- Inserts an extra icon (📋) beside AI Studio’s native **Copy to clipboard** / **Download** buttons.
-- Copies the **entire content** of the associated `<code>` block, even if scrolled or truncated.
-- Shows a quick “✔” feedback for two seconds, then reverts.
+## Kurulum
 
-### Installation
-1. Clone or download this repository.  
-2. Open Chrome and navigate to `chrome://extensions/`.  
-3. Enable **Developer mode**.  
-4. Click **Load unpacked** and select this project folder.  
-5. Visit any supported page to see the extension in action.
+1. Chrome'da `chrome://extensions/` adresine gidin
+2. "Geliştirici modu"nu açın
+3. "Paketlenmemiş öğe yükle" butonuna tıklayın
+4. `chrome_extension` klasörünü seçin
 
-### Usage
+## Kullanım
 
-| Feature | How to use |
-|---------|------------|
-| Accordion | Click the ▼ button at the top-right of an Angular `<pre>` block to expand it. Click the ▲ button at the bottom-right to collapse and auto-scroll into view. |
-| Snippet Sidebar | Click the floating `{}` button to open/close the sidebar. In the list, use **Copy** to copy a snippet or click the preview to open full view. |
-| Full-Code Copy | Hover over AI Studio’s toolbar under a code card: click the new 📋 button to copy the entire `<code>` section. A ✔ confirms success. |
+### Sistem Talimatları
+1. Eklenti simgesine tıklayın
+2. "Sistem Talimatları" bölümünde metin alanına talimatlarınızı yazın
+3. "Kaydet" butonuna tıklayın
+4. Artık tüm prompt'larda bu talimatlar otomatik olarak eklenecek
 
----
+### IDE Seçimi
+1. Eklenti simgesine tıklayın
+2. Cursor veya Visual Studio Code seçin
+3. Seçiminiz kaydedilecek ve kod blokları bu IDE'ye gönderilecek
 
-## Türkçe
+### Kod Blokları
+- Kod bloklarında "IDE'ye Gönder" butonuna tıklayın
+- Kod otomatik olarak seçili IDE'de açılacak
 
-**Dinamik Kod Bloğu Akordiyonu & Kod Parçacığı Kenar Çubuğu**, herhangi bir web sayfasındaki kod görüntüleme deneyimini geliştiren bir Chrome uzantısıdır. Artık **üç** ana özellik sunar:
+### Plan Aşamaları
+- Metin seçin ve sağ tık yapın
+- "Plan Aşamalarına Ekle" seçeneğini seçin
+- Sidebar'da aşamaları görüntüleyin ve prompt'a gönderin
 
-1.  **`<pre>` blokları için akordiyon** (Angular’a özgü)  
-2.  **Üçlü backtick (``` ``` ) parçacıkları için kenar çubuğu**  
-3.  **AI Studio araç çubuğuna tam-kod kopyalama düğmesi**
+## Teknik Detaylar
 
-### Özellikler
+### Dosya Yapısı
+```
+chrome_extension/
+├── manifest.json          # Eklenti manifesti
+├── popup.html            # Popup arayüzü
+├── popup.js              # Popup JavaScript
+├── popup.css             # Popup stilleri
+├── src/
+│   ├── main.js           # Ana content script
+│   ├── handlers.js       # Event handler'lar
+│   ├── ui.js             # UI bileşenleri
+│   └── ...
+└── styles.css            # Content script stilleri
+```
 
-#### `<pre>` blokları için akordiyon
-- Angular'ın `_ngcontent-ng-c` özniteliğini içeren `<pre>` bloklarını otomatik olarak daraltılabilir bir sarmalayıcı içine alır.
-- `<pre>` bloğunun sağ üstünde ▼/▲ geçiş düğmesi.
-- Genişletilmiş bloğun sağ alt köşesinde kapanış düğmesi (▲); daraltıldığında bloğu görünür alana kaydırır.
-- Açma/kapama sırasında yumuşak kaydırma efektleri.
+### Storage Keys
+- `selectedIDE`: Seçili IDE tercihi
+- `systemInstructions`: Sistem talimatları
 
-#### Üçlü backtick parçacıkları için kenar çubuğu
-- Sürüklenebilir `{}` düğmesiyle özel kenar çubuğunu açıp kapatın.  
-  Konumu kaydedilir ve sonradan geri yüklenir.
-- Sayfayı üçlü backtick ile çevrili kodlar için tarar, listeler ve hızlı kopyalama sunar.
-- Parçacığa tıklayınca ayrıntılı görünüm ve ek **Kopyala** düğmesi.
+### API Entegrasyonu
+- Chrome Storage API kullanımı
+- AI Studio DOM manipülasyonu
+- IDE deep-link URI'leri
 
-#### Tam-Kod Kopyala düğmesi (YENİ v1.4)
-- AI Studio’nun **Kopyala** / **İndir** düğmelerinin hemen yanına 📋 simgesi ekler.
-- İlgili `<code>` bloğundaki **tüm** içeriği kopyalar, kısıtlama olmaksızın.
-- 2 saniyeliğine ✔ işaretiyle başarılı kopyalama bildirimi verir.
+## Geliştirme
 
-### Kurulum
-1. Depoyu klonlayın veya indirin.  
-2. Chrome’da `chrome://extensions/` sayfasını açın.  
-3. **Geliştirici modu**nu etkinleştirin.  
-4. **Paketlenmemiş yükle** butonuna tıklayıp proje klasörünü seçin.  
-5. Desteklenen bir sayfayı ziyaret ederek uzantıyı deneyin.
+Eklentiyi geliştirmek için:
+1. Dosyaları düzenleyin
+2. Chrome'da eklentiyi yenileyin
+3. AI Studio'da test edin
 
-### Kullanım
+## Lisans
 
-| Özellik | Nasıl kullanılır |
-|---------|-----------------|
-| Akordiyon | Angular `<pre>` bloğunun sağ üstündeki ▼ düğmesine tıklayın. Genişletildiğinde sağ altta beliren ▲ düğmesi ile kapatın. |
-| Tam-Kod Kopyala | AI Studio kartının altındaki araç çubuğunda yeni 📋 simgesine tıklayın. ✔ ile kopyalama onayı alın. |
+MIT License

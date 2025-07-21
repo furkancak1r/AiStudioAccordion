@@ -61,11 +61,17 @@ async function importFromClipboard() {
   }
 }
 
-function sendToPrompt(index) {
+async function sendToPrompt(index) {
     const text = detectedSections[index];
     if (!text) return;
   
-    const promptText = `go ${text}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
+    const systemInstructions = await getSystemInstructions();
+    let promptText = `go ${text}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
+    
+    if (systemInstructions.trim()) {
+      promptText += `\n\nSistem talimatları: ${systemInstructions}`;
+    }
+    
     const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
     const runButton = document.querySelector('run-button button[type="submit"]');
   
@@ -182,10 +188,16 @@ function addSelectedTextToStages(selectedText) {
   }, 2000);
 }
 
-function sendSelectedTextToPrompt(selectedText) {
+async function sendSelectedTextToPrompt(selectedText) {
   if (!selectedText) return;
   
-  const promptText = `go ${selectedText}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
+  const systemInstructions = await getSystemInstructions();
+  let promptText = `go ${selectedText}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
+  
+  if (systemInstructions.trim()) {
+    promptText += `\n\nSistem talimatları: ${systemInstructions}`;
+  }
+  
   const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
   const runButton = document.querySelector('run-button button[type="submit"]');
   
