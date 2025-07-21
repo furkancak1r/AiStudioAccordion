@@ -655,7 +655,7 @@
 }
 
 /* Git Commit Button Styles */
-.git-commit-btn-fwk {
+.git-commit-btn-fwk, .analyze-files-btn-fwk {
   background: transparent;
   border: none;
   border-radius: 50%;
@@ -670,12 +670,12 @@
   padding: 0;
 }
 
-.git-commit-btn-fwk:hover {
+.git-commit-btn-fwk:hover, .analyze-files-btn-fwk:hover {
   background-color: var(--color-state-layer-on-surface-008, rgba(227, 227, 227, 0.08));
   color: var(--color-on-surface, #e3e3e3);
 }
 
-.git-commit-btn-fwk svg {
+.git-commit-btn-fwk svg, .analyze-files-btn-fwk svg {
     width: 20px;
     height: 20px;
 }

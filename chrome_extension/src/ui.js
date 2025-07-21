@@ -13,7 +13,7 @@ const btn = document.createElement('button');
 btn.className = `markdown-${iconKey}-btn-fwk ${extraClass}`.trim();
 btn.innerHTML = ICONS[iconKey];
 btn.title = title;
-if (iconKey === 'vscode' || iconKey === 'git') {
+if (iconKey === 'vscode' || iconKey === 'git' || iconKey === 'analyze') {
   btn.onclick = (e) => {
     onClick(e);
   };
@@ -294,4 +294,8 @@ actionBar.dataset.vscodeBtnInjected = '1';
 
 function createGitCommitButton() {
     return createButton('git', 'Git Komutlarını İste', sendGitCommitPrompt, 'git-commit-btn-fwk');
+}
+
+function createAnalyzeFilesButton() {
+    return createButton('analyze', 'Dosyaları Analiz Et', sendAnalyzeFilesPrompt, 'analyze-files-btn-fwk');
 }

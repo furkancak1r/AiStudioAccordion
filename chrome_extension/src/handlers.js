@@ -112,6 +112,25 @@ async function sendGitCommitPrompt() {
     }
 }
 
+async function sendAnalyzeFilesPrompt() {
+    const appendText = ' burası ile ilgili tüm dosyaları tespit et. Her satırın başında \'#\' olacak şekilde dosya yolları listesini paylaş. Kod bloğu içinde ver. Genel bilgileri de ekle, örneğin remember, package.json, gemini.md, prd.md';
+    const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
+    const runButton = document.querySelector('run-button button[type="submit"]');
+
+    if (textarea && runButton) {
+        textarea.value += appendText;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        setTimeout(() => {
+            if (!runButton.disabled) {
+                runButton.click();
+            }
+        }, 100);
+    } else {
+        console.error('Prompt textarea veya run butonu bulunamadı.');
+    }
+}
+
 
 async function sendToVscode(event) {
   console.log('🚀 sendToVscode started');

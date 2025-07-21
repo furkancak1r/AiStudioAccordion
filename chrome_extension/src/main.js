@@ -4,8 +4,8 @@
     document.querySelectorAll('div.actions').forEach(enhanceActionBarWithVscodeButton);
   }
 
-  function enhancePromptInputWithGitButton(container) {
-    if (!container || container.dataset.gitBtnInjected === '1') {
+  function enhancePromptInputArea(container) {
+    if (!container || container.dataset.promptEnhanced === '1') {
       return;
     }
 
@@ -14,21 +14,28 @@
       return;
     }
 
+    // Git Button
     const gitButton = createGitCommitButton();
     const gitButtonWrapper = document.createElement('div');
     gitButtonWrapper.className = 'button-wrapper';
     gitButtonWrapper.appendChild(gitButton);
     
-    // run-button'ın parent'ı olan .button-wrapper'ın önüne ekle
+    // Analyze Button
+    const analyzeButton = createAnalyzeFilesButton();
+    const analyzeButtonWrapper = document.createElement('div');
+    analyzeButtonWrapper.className = 'button-wrapper';
+    analyzeButtonWrapper.appendChild(analyzeButton);
+
     const runButtonParentWrapper = runButtonWrapper.closest('.button-wrapper');
     if (runButtonParentWrapper) {
       container.insertBefore(gitButtonWrapper, runButtonParentWrapper);
-      container.dataset.gitBtnInjected = '1';
+      container.insertBefore(analyzeButtonWrapper, runButtonParentWrapper);
+      container.dataset.promptEnhanced = '1';
     }
   }
 
   function scanAndEnhancePromptInputs() {
-    document.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputWithGitButton);
+    document.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputArea);
   }
 
   function initializeSidebar() {
@@ -241,9 +248,9 @@
         }
 
         if (node.matches && node.matches('div.prompt-input-wrapper-container')) {
-          enhancePromptInputWithGitButton(node);
+          enhancePromptInputArea(node);
         } else if (node.querySelectorAll) {
-          node.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputWithGitButton);
+          node.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputArea);
         }
       });
     });
