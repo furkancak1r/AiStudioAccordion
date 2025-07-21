@@ -37,6 +37,65 @@
   function scanAndEnhancePromptInputs() {
     document.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputArea);
   }
+  
+  function configureModelSettings(settingsView) {
+    if (!settingsView || settingsView.dataset.settingsConfigured === '1') {
+      return;
+    }
+
+    // --- Configure Thinking Budget ---
+    const budgetToggle = settingsView.querySelector('mat-slide-toggle[data-test-toggle="manual-budget"] button');
+    if (budgetToggle && budgetToggle.getAttribute('aria-checked') === 'false') {
+        budgetToggle.click();
+    }
+
+    // Wait for the inputs to become available after toggle
+    setTimeout(() => {
+        const numberInput = settingsView.querySelector('input[type="number"].manual-input');
+        const rangeInput = settingsView.querySelector('input[type="range"][matsliderthumb]');
+
+        if (numberInput && numberInput.value !== '32768') {
+            numberInput.value = '32768';
+            numberInput.dispatchEvent(new Event('input', { bubbles: true }));
+            numberInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (rangeInput && rangeInput.value !== '32768') {
+            rangeInput.value = '32768';
+            rangeInput.dispatchEvent(new Event('input', { bubbles: true }));
+            rangeInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }, 100);
+
+    // --- Configure Media Resolution ---
+    const resolutionSelector = settingsView.querySelector('mat-select[aria-label="Media Resolution"]');
+    if (resolutionSelector) {
+        const selectedTextSpan = resolutionSelector.querySelector('.mat-mdc-select-min-line');
+        if (selectedTextSpan && selectedTextSpan.textContent.trim() !== 'Medium') {
+            resolutionSelector.click(); // Open the dropdown
+
+            // Wait for the options panel to appear
+            setTimeout(() => {
+                const options = document.querySelectorAll('mat-option .mdc-list-item__primary-text');
+                for (const option of options) {
+                    if (option.textContent.trim() === 'Medium') {
+                        option.click();
+                        break;
+                    }
+                }
+                 // Close the dropdown if it's still open
+                const backdrop = document.querySelector('.cdk-overlay-backdrop');
+                if(backdrop) backdrop.click();
+
+            }, 200);
+        }
+    }
+    
+    settingsView.dataset.settingsConfigured = '1';
+  }
+
+  function scanAndConfigureModelSettings() {
+    document.querySelectorAll('ms-settings-view').forEach(configureModelSettings);
+  }
 
   function initializeSidebar() {
     if (document.querySelector('ms-app') && !document.querySelector('.markdown-sidebar-fwk')) {
@@ -252,6 +311,12 @@
         } else if (node.querySelectorAll) {
           node.querySelectorAll('div.prompt-input-wrapper-container').forEach(enhancePromptInputArea);
         }
+
+        if (node.matches && node.matches('ms-settings-view')) {
+          configureModelSettings(node);
+        } else if (node.querySelectorAll) {
+          node.querySelectorAll('ms-settings-view').forEach(configureModelSettings);
+        }
       });
     });
   });
@@ -259,6 +324,7 @@
   initializeSidebar();
   scanAndEnhanceActionBars();
   scanAndEnhancePromptInputs();
+  scanAndConfigureModelSettings();
   loadIDEPreference(); // Load IDE preference on startup
   setupTextSelectionListener(); // Setup text selection listener
   setupSystemInstructionsObserver(); // Setup system instructions observer
