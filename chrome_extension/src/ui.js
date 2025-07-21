@@ -312,7 +312,7 @@ function createSequentialSendButton() {
 
 function sendStagesSequentially() {
     if (detectedSections.length === 0) {
-        showNotification('Gönderilecek aşama bulunamadı!', 'warning');
+        showPopup('Gönderilecek aşama bulunamadı!', 'warning', 'Uyarı');
         return;
     }
 
@@ -342,7 +342,7 @@ function sendStagesSequentially() {
             // Tüm aşamaları sil
             detectedSections.splice(0, detectedSections.length);
             renderSections();
-            showNotification('Tüm aşamalar başarıyla gönderildi!', 'success');
+            showPopup('Tüm aşamalar başarıyla gönderildi!', 'success', 'İşlem Tamamlandı');
             return;
         }
 
@@ -360,16 +360,128 @@ function sendStagesSequentially() {
                     // Tüm aşamaları sil
                     detectedSections.splice(0, detectedSections.length);
                     renderSections();
-                    showNotification('Tüm aşamalar başarıyla gönderildi!', 'success');
+                    showPopup('Tüm aşamalar başarıyla gönderildi!', 'success', 'İşlem Tamamlandı');
                 }
             }, 2000);
         }).catch(() => {
             updateButtonState(false);
-            showNotification(`Aşama ${currentIndex + 1} gönderilirken hata oluştu!`, 'error');
+            showPopup(`Aşama ${currentIndex + 1} gönderilirken hata oluştu!`, 'error', 'Hata');
         });
     }
 
     sendNextStage();
+}
+
+function showPopup(message, type = 'info', title = 'Bilgi') {
+    // Mevcut popup'ları temizle
+    const existingPopups = document.querySelectorAll('.ai-popup-fwk');
+    existingPopups.forEach(popup => popup.remove());
+
+    const overlay = document.createElement('div');
+    overlay.className = 'ai-popup-overlay-fwk';
+    
+    const popup = document.createElement('div');
+    popup.className = `ai-popup-fwk ai-popup-${type}`;
+    
+    const header = document.createElement('div');
+    header.className = 'ai-popup-header-fwk';
+    
+    const icon = document.createElement('span');
+    icon.className = 'ai-popup-icon';
+    
+    // Type'a göre icon seç
+    switch(type) {
+        case 'success':
+            icon.innerHTML = ICONS.success;
+            break;
+        case 'error':
+            icon.innerHTML = ICONS.error;
+            break;
+        case 'warning':
+            icon.innerHTML = ICONS.warning;
+            break;
+        default:
+            icon.innerHTML = ICONS.info;
+    }
+    
+    const titleElement = document.createElement('span');
+    titleElement.className = 'ai-popup-title';
+    titleElement.textContent = title;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'ai-popup-close';
+    closeBtn.innerHTML = ICONS.close;
+    closeBtn.onclick = () => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.remove();
+            }
+        }, 300);
+    };
+    
+    header.appendChild(icon);
+    header.appendChild(titleElement);
+    header.appendChild(closeBtn);
+    
+    const content = document.createElement('div');
+    content.className = 'ai-popup-content';
+    content.textContent = message;
+    
+    const footer = document.createElement('div');
+    footer.className = 'ai-popup-footer';
+    
+    const okBtn = document.createElement('button');
+    okBtn.className = 'ai-popup-ok-btn';
+    okBtn.textContent = 'Tamam';
+    okBtn.onclick = () => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.remove();
+            }
+        }, 300);
+    };
+    
+    footer.appendChild(okBtn);
+    
+    popup.appendChild(header);
+    popup.appendChild(content);
+    popup.appendChild(footer);
+    overlay.appendChild(popup);
+    
+    document.body.appendChild(overlay);
+    
+    // Enter tuşu ile kapatma
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' || e.key === 'Escape') {
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 300);
+            document.removeEventListener('keydown', handleKeyPress);
+        }
+    };
+    document.addEventListener('keydown', handleKeyPress);
+    
+    // Overlay'e tıklayarak kapatma
+    overlay.onclick = (e) => {
+        if (e.target === overlay) {
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 300);
+        }
+    };
+    
+    // Focus ok button
+    setTimeout(() => {
+        okBtn.focus();
+    }, 100);
 }
 
 function showNotification(message, type = 'info') {

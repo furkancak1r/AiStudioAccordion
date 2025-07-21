@@ -54,11 +54,11 @@ async function importFromClipboard() {
         toggleSidebar();
       }
     } else {
-      showNotification('Pano boş.', 'warning');
+      showPopup('Pano boş.', 'warning', 'Uyarı');
     }
   } catch (err) {
     console.error('Pano okuma hatası:', err);
-    showNotification('Panoya erişilemedi veya izin verilmedi.', 'error');
+    showPopup('Panoya erişilemedi veya izin verilmedi.', 'error', 'Hata');
   }
 }
 
@@ -66,12 +66,7 @@ async function sendToPrompt(index, sequential = false) {
     const text = detectedSections[index];
     if (!text) return Promise.resolve();
   
-    const systemInstructions = await getSystemInstructions();
     let promptText = `go ${text}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
-    
-    if (systemInstructions.trim()) {
-      promptText += `\n\nSistem talimatları: ${systemInstructions}`;
-    }
     
     const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
     const runButton = document.querySelector('run-button button[type="submit"]');
@@ -86,12 +81,10 @@ async function sendToPrompt(index, sequential = false) {
             runButton.click();
             
             if (!sequential) {
-              // Tekil gönderimde aşamayı sil
               detectedSections.splice(index, 1);
               renderSections();
               resolve();
             } else {
-              // Sequential gönderimde AI'ın yanıt vermesini bekle
               waitForAIResponse().then(() => {
                 resolve();
               }).catch((error) => {
@@ -117,7 +110,6 @@ function waitForAIResponse() {
         const checkInterval = 500; // Her 500ms kontrol et
         let responseDetected = false;
         
-        // Run button'ın durumunu izle
         const checkForResponse = () => {
             attempts++;
             
@@ -125,23 +117,18 @@ function waitForAIResponse() {
                 return;
             }
             
-            // Run button'ı bul
             const runButton = document.querySelector('run-button button[type="submit"]');
             
             if (runButton) {
-                // Button disabled ve "Run" yazıyor mu kontrol et
                 const isDisabled = runButton.hasAttribute('disabled') || runButton.getAttribute('aria-disabled') === 'true';
                 const buttonLabel = runButton.querySelector('.label');
                 const labelText = buttonLabel ? buttonLabel.textContent.trim() : '';
                 
-                // Button class'larını kontrol et
                 const hasDisabledClass = runButton.classList.contains('disabled');
                 const hasNoTimerClass = runButton.classList.contains('no-timer');
                 
-                // Typing indicator yok mu kontrol et
                 const isTyping = document.querySelector('div[data-testid="typing-indicator"]');
                 
-                // AI yanıt verdi: button disabled, "Run" yazıyor, typing yok ve disabled class var
                 if (isDisabled && labelText === 'Run' && !isTyping && hasDisabledClass && !responseDetected) {
                     responseDetected = true;
                     console.log('AI yanıt verdi, devam ediliyor...');
@@ -153,10 +140,9 @@ function waitForAIResponse() {
                 }
             }
             
-            // Timeout kontrolü
             if (attempts >= maxAttempts) {
                 console.warn('AI yanıt timeout, devam ediliyor...');
-                resolve(); // Timeout olsa bile devam et
+                resolve(); 
                 return;
             }
             
@@ -167,8 +153,114 @@ function waitForAIResponse() {
     });
 }
 
+function showPopup(message, type = 'info', title = 'Bilgi') {
+    const existingPopups = document.querySelectorAll('.ai-popup-fwk');
+    existingPopups.forEach(popup => popup.remove());
+
+    const overlay = document.createElement('div');
+    overlay.className = 'ai-popup-overlay-fwk';
+    
+    const popup = document.createElement('div');
+    popup.className = `ai-popup-fwk ai-popup-${type}`;
+    
+    const header = document.createElement('div');
+    header.className = 'ai-popup-header-fwk';
+    
+    const icon = document.createElement('span');
+    icon.className = 'ai-popup-icon';
+    
+    switch(type) {
+        case 'success':
+            icon.innerHTML = ICONS.success;
+            break;
+        case 'error':
+            icon.innerHTML = ICONS.error;
+            break;
+        case 'warning':
+            icon.innerHTML = ICONS.warning;
+            break;
+        default:
+            icon.innerHTML = ICONS.info;
+    }
+    
+    const titleElement = document.createElement('span');
+    titleElement.className = 'ai-popup-title';
+    titleElement.textContent = title;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'ai-popup-close';
+    closeBtn.innerHTML = ICONS.close;
+    closeBtn.onclick = () => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.remove();
+            }
+        }, 300);
+    };
+    
+    header.appendChild(icon);
+    header.appendChild(titleElement);
+    header.appendChild(closeBtn);
+    
+    const content = document.createElement('div');
+    content.className = 'ai-popup-content';
+    content.textContent = message;
+    
+    const footer = document.createElement('div');
+    footer.className = 'ai-popup-footer';
+    
+    const okBtn = document.createElement('button');
+    okBtn.className = 'ai-popup-ok-btn';
+    okBtn.textContent = 'Tamam';
+    okBtn.onclick = () => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.remove();
+            }
+        }, 300);
+    };
+    
+    footer.appendChild(okBtn);
+    
+    popup.appendChild(header);
+    popup.appendChild(content);
+    popup.appendChild(footer);
+    overlay.appendChild(popup);
+    
+    document.body.appendChild(overlay);
+    
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' || e.key === 'Escape') {
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 300);
+            document.removeEventListener('keydown', handleKeyPress);
+        }
+    };
+    document.addEventListener('keydown', handleKeyPress);
+    
+    overlay.onclick = (e) => {
+        if (e.target === overlay) {
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 300);
+        }
+    };
+    
+    setTimeout(() => {
+        okBtn.focus();
+    }, 100);
+}
+
 function showNotification(message, type = 'info') {
-    // Mevcut notification'ları temizle
     const existingNotifications = document.querySelectorAll('.ai-notification-fwk');
     existingNotifications.forEach(notification => notification.remove());
 
@@ -178,7 +270,6 @@ function showNotification(message, type = 'info') {
     const icon = document.createElement('span');
     icon.className = 'ai-notification-icon';
     
-    // Type'a göre icon seç
     switch(type) {
         case 'success':
             icon.innerHTML = ICONS.success;
@@ -208,7 +299,6 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Otomatik kaldırma
     setTimeout(() => {
         if (notification.parentNode) {
             notification.classList.add('fade-out');
@@ -266,13 +356,13 @@ async function sendToVscode(event) {
   const button = event.currentTarget;
   const codeBlockElement = button.closest('ms-code-block');
   if (!codeBlockElement) {
-    showNotification('İlişkili kod bloğu bulunamadı.', 'warning');
+    showPopup('İlişkili kod bloğu bulunamadı.', 'warning', 'Uyarı');
     return;
   }
   
   const codeElement = codeBlockElement.querySelector('code');
   if (!codeElement) {
-    showNotification('Kod içeriği bulunamadı.', 'warning');
+    showPopup('Kod içeriği bulunamadı.', 'warning', 'Uyarı');
     return;
   }
 
@@ -282,14 +372,14 @@ async function sendToVscode(event) {
 
   const pathMatch = firstLine.match(/^(?:\/\/\s*(.*)|#\s*(.*)|\/\*\s*(.*?)\s*\*\/|<!--\s*(.*?)\s*-->|--\s*(.*)|%\s*(.*))/);
   if (!pathMatch) {
-    showNotification('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning');
+    showPopup('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning', 'Dosya Yolu Hatası');
     return;
   }
   
   const filePath = (pathMatch[1] || pathMatch[2] || pathMatch[3] || pathMatch[4] || pathMatch[5] || pathMatch[6] || '').trim();
   
   if (!filePath) {
-    showNotification('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning');
+    showPopup('Kodun ilk satırında geçerli bir dosya yolu yorumu bulunamadı.\nÖrnekler:\n// src/app.js\n# src/app.py\n/* src/app.css */\n<!-- src/app.html -->\n-- src/app.sql\n% src/app.m', 'warning', 'Dosya Yolu Hatası');
     return;
   }
   
@@ -302,11 +392,9 @@ async function sendToVscode(event) {
     
     let uri;
     if (fullCode.length > 1000) {
-      // Uzun content - sadece clipboard kullan
       uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}`;
       console.log(`🚀 URI (${uriScheme}) açılıyor (clipboard mode): ${filePath} - ${fullCode.length} karakter`);
     } else {
-      // Kısa content - URI'ye content ekle
       const encodedContent = encodeURIComponent(fullCode);
       uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
       console.log(`🚀 URI (${uriScheme}) açılıyor (URI mode): ${filePath} - ${fullCode.length} karakter`);
@@ -326,7 +414,7 @@ async function sendToVscode(event) {
     }
   } catch (error) {
     console.error('❌ URI açma veya panoya kopyalama hatası:', error);
-    showNotification('İşlem başarısız: ' + error.message + '\n\nTarayıcı konsolunu kontrol edin (F12).', 'error');
+    showPopup('İşlem başarısız: ' + error.message + '\n\nTarayıcı konsolunu kontrol edin (F12).', 'error', 'Hata');
   }
 }
 
@@ -341,7 +429,6 @@ function addSelectedTextToStages(selectedText) {
   renderSections();
   updateCache();
   
-  // Visual feedback
   const message = document.createElement('div');
   message.className = 'selection-feedback-fwk';
   message.textContent = 'Plan aşamalarına eklendi!';
@@ -359,12 +446,7 @@ function addSelectedTextToStages(selectedText) {
 async function sendSelectedTextToPrompt(selectedText) {
   if (!selectedText) return;
   
-  const systemInstructions = await getSystemInstructions();
   let promptText = `go ${selectedText}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
-  
-  if (systemInstructions.trim()) {
-    promptText += `\n\nSistem talimatları: ${systemInstructions}`;
-  }
   
   const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
   const runButton = document.querySelector('run-button button[type="submit"]');
