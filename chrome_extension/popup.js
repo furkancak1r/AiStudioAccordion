@@ -2,6 +2,7 @@
 const STORAGE_KEY = 'selectedIDE';
 const SYSTEM_INSTRUCTIONS_KEY = 'systemInstructions';
 const AUTO_APPLY_KEY = 'autoApplySystemInstructions';
+const MAX_INSTRUCTIONS_SIZE = 50000; // 50KB limit
 
 document.addEventListener('DOMContentLoaded', function() {
     const ideOptions = document.querySelectorAll('.ide-option');
@@ -29,7 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectedVisuals(selectedIDE);
             
             chrome.storage.local.set({[STORAGE_KEY]: selectedIDE}, function() {
-                console.log('IDE tercihi kaydedildi:', selectedIDE);
+                if (chrome.runtime.lastError) {
+                    console.error('IDE tercihi kaydedilemedi:', chrome.runtime.lastError);
+                } else {
+                    console.log('IDE tercihi kaydedildi:', selectedIDE);
+                }
             });
         });
     });
@@ -39,8 +44,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const isEnabled = this.checked;
             
             chrome.storage.local.set({[AUTO_APPLY_KEY]: isEnabled}, function() {
-                console.log('Otomatik uygulama ayarı kaydedildi:', isEnabled);
-                showToggleFeedback(isEnabled);
+                if (chrome.runtime.lastError) {
+                    console.error('Otomatik uygulama ayarı kaydedilemedi:', chrome.runtime.lastError);
+                } else {
+                    console.log('Otomatik uygulama ayarı kaydedildi:', isEnabled);
+                    showToggleFeedback(isEnabled);
+                }
             });
         });
     }
@@ -49,9 +58,21 @@ document.addEventListener('DOMContentLoaded', function() {
         saveInstructionsBtn.addEventListener('click', function() {
             const instructions = systemInstructionsTextarea.value.trim();
             
+            // Check size before saving
+            const size = new Blob([instructions]).size;
+            if (size > MAX_INSTRUCTIONS_SIZE) {
+                alert('Sistem talimatları çok büyük. Lütfen daha kısa talimatlar girin.');
+                return;
+            }
+            
             chrome.storage.local.set({[SYSTEM_INSTRUCTIONS_KEY]: instructions}, function() {
-                console.log('Sistem talimatları kaydedildi:', instructions);
-                showSaveFeedback();
+                if (chrome.runtime.lastError) {
+                    console.error('Sistem talimatları kaydedilemedi:', chrome.runtime.lastError);
+                    alert('Sistem talimatları kaydedilemedi. Lütfen tekrar deneyin.');
+                } else {
+                    console.log('Sistem talimatları kaydedildi:', instructions);
+                    showSaveFeedback();
+                }
             });
         });
     }
@@ -61,8 +82,12 @@ document.addEventListener('DOMContentLoaded', function() {
             systemInstructionsTextarea.value = '';
             
             chrome.storage.local.remove([SYSTEM_INSTRUCTIONS_KEY], function() {
-                console.log('Sistem talimatları temizlendi');
-                showClearFeedback();
+                if (chrome.runtime.lastError) {
+                    console.error('Sistem talimatları temizlenemedi:', chrome.runtime.lastError);
+                } else {
+                    console.log('Sistem talimatları temizlendi');
+                    showClearFeedback();
+                }
             });
         });
     }

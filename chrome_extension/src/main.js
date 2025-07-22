@@ -84,7 +84,11 @@ Kullanıcı “git add . git commit -m \"…\" git push kodlarını ver” dedi�
 
   chrome.storage.local.get(['systemInstructions'], function(result) {
     if (!result.systemInstructions) {
-      chrome.storage.local.set({ systemInstructions: DEFAULT_SYSTEM_INSTRUCTIONS });
+      chrome.storage.local.set({ systemInstructions: DEFAULT_SYSTEM_INSTRUCTIONS }, function() {
+        if (chrome.runtime.lastError) {
+          console.error('Sistem talimatları kaydedilemedi:', chrome.runtime.lastError);
+        }
+      });
     }
   });
 
@@ -312,7 +316,12 @@ Kullanıcı “git add . git commit -m \"…\" git push kodlarını ver” dedi�
   window.getSystemInstructions = function() {
     return new Promise((resolve) => {
       chrome.storage.local.get(['systemInstructions'], function(result) {
-        resolve(result.systemInstructions || '');
+        if (chrome.runtime.lastError) {
+          console.error('Sistem talimatları alınamadı:', chrome.runtime.lastError);
+          resolve(''); // Return empty string on error
+        } else {
+          resolve(result.systemInstructions || '');
+        }
       });
     });
   };
@@ -320,7 +329,12 @@ Kullanıcı “git add . git commit -m \"…\" git push kodlarını ver” dedi�
   function getAutoApplySetting() {
     return new Promise((resolve) => {
       chrome.storage.local.get(['autoApplySystemInstructions'], function(result) {
-        resolve(result.autoApplySystemInstructions !== false); // Default to true
+        if (chrome.runtime.lastError) {
+          console.error('Otomatik uygulama ayarı alınamadı:', chrome.runtime.lastError);
+          resolve(true); // Default to true on error
+        } else {
+          resolve(result.autoApplySystemInstructions !== false); // Default to true
+        }
       });
     });
   }

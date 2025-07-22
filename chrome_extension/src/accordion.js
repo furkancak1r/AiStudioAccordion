@@ -22,20 +22,43 @@
             }
     
             let lastScrollHeight = 0;
+            let stableCount = 0;
+            const maxStableChecks = 5;
+            const maxTimeout = 10000;
+            let startTime = Date.now();
+            
             const scrollInterval = setInterval(() => {
                 preElement.scrollTop = preElement.scrollHeight;
     
                 if (preElement.scrollHeight === lastScrollHeight) {
-                    clearInterval(scrollInterval);
-                    const fullContent = preElement.textContent || '';
-                    
-                    buttonElement.classList.remove('processing');
-                    
-                    resolve(fullContent);
+                    stableCount++;
+                    if (stableCount >= maxStableChecks) {
+                        clearInterval(scrollInterval);
+                        
+                        setTimeout(() => {
+                            preElement.scrollTop = preElement.scrollHeight;
+                            setTimeout(() => {
+                                const fullContent = preElement.textContent || '';
+                                buttonElement.classList.remove('processing');
+                                resolve(fullContent);
+                            }, 100);
+                        }, 200);
+                    }
                 } else {
                     lastScrollHeight = preElement.scrollHeight;
+                    stableCount = 0;
                 }
-            }, 100);
+                
+                if (Date.now() - startTime > maxTimeout) {
+                    clearInterval(scrollInterval);
+                    preElement.scrollTop = preElement.scrollHeight;
+                    setTimeout(() => {
+                        const fullContent = preElement.textContent || '';
+                        buttonElement.classList.remove('processing');
+                        resolve(fullContent);
+                    }, 100);
+                }
+            }, 150);
         });
     }
 

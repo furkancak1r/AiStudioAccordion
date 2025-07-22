@@ -7,6 +7,8 @@
     const TRUNCATE_LENGTH = 10; // Show only first 10 words
     const MESSAGE_STATE_KEY = 'aistudio-message-states';
     const DEBOUNCE_DELAY = 100;
+    const MAX_MESSAGES = 50; // Reduced from 100
+    const MAX_STORAGE_SIZE = 1000000; // 1MB limit (reduced from 5MB)
 
     // Store original messages
     const messageStates = new Map();
@@ -20,13 +22,61 @@
         return words.slice(0, wordLimit).join(' ') + '...';
     };
 
-    // Save message states to sessionStorage
+    // Save message states to sessionStorage with better error handling
     function saveMessageStates() {
-        const states = {};
-        messageStates.forEach((value, key) => {
-            states[key] = value;
-        });
-        sessionStorage.setItem(MESSAGE_STATE_KEY, JSON.stringify(states));
+        try {
+            // Check current storage size first
+            const currentData = sessionStorage.getItem(MESSAGE_STATE_KEY);
+            if (currentData) {
+                const currentSize = new Blob([currentData]).size;
+                if (currentSize > MAX_STORAGE_SIZE) {
+                    clearOldMessageStates();
+                }
+            }
+
+            const states = {};
+            messageStates.forEach((value, key) => {
+                // Limit individual message size
+                if (value.originalText && value.originalText.length > 1000) {
+                    value.originalText = value.originalText.substring(0, 1000) + '...';
+                }
+                states[key] = value;
+            });
+            
+            const dataToSave = JSON.stringify(states);
+            const newSize = new Blob([dataToSave]).size;
+            
+            // Final size check
+            if (newSize > MAX_STORAGE_SIZE) {
+                clearOldMessageStates();
+                // Try again with reduced data
+                const reducedStates = {};
+                const entries = Array.from(messageStates.entries()).slice(0, 25);
+                entries.forEach(([key, value]) => {
+                    reducedStates[key] = value;
+                });
+                sessionStorage.setItem(MESSAGE_STATE_KEY, JSON.stringify(reducedStates));
+            } else {
+                sessionStorage.setItem(MESSAGE_STATE_KEY, dataToSave);
+            }
+        } catch (e) {
+            console.warn('Failed to save message states, clearing old data:', e);
+            clearOldMessageStates();
+            try {
+                // Try with minimal data
+                const minimalStates = {};
+                const entries = Array.from(messageStates.entries()).slice(0, 10);
+                entries.forEach(([key, value]) => {
+                    minimalStates[key] = value;
+                });
+                sessionStorage.setItem(MESSAGE_STATE_KEY, JSON.stringify(minimalStates));
+            } catch (e2) {
+                console.error('Failed to save message states after cleanup:', e2);
+                // Last resort: clear everything
+                messageStates.clear();
+                sessionStorage.removeItem(MESSAGE_STATE_KEY);
+            }
+        }
     }
 
     // Load message states from sessionStorage
@@ -38,9 +88,44 @@
                 Object.entries(states).forEach(([key, value]) => {
                     messageStates.set(key, value);
                 });
+                
+                // Clean up if too many messages loaded
+                if (messageStates.size > MAX_MESSAGES) {
+                    clearOldMessageStates();
+                }
             }
         } catch (e) {
             console.error('Failed to load message states:', e);
+            clearOldMessageStates();
+        }
+    }
+
+    // Clear old message states to free up storage
+    function clearOldMessageStates() {
+        try {
+            // Keep only the most recent messages
+            const entries = Array.from(messageStates.entries());
+            if (entries.length > MAX_MESSAGES) {
+                const sortedEntries = entries.sort((a, b) => {
+                    // Sort by timestamp if available, otherwise keep newer entries
+                    const aTime = a[1].timestamp || 0;
+                    const bTime = b[1].timestamp || 0;
+                    return bTime - aTime;
+                });
+                
+                messageStates.clear();
+                sortedEntries.slice(0, MAX_MESSAGES).forEach(([key, value]) => {
+                    messageStates.set(key, value);
+                });
+            }
+            
+            // Clear from sessionStorage
+            sessionStorage.removeItem(MESSAGE_STATE_KEY);
+        } catch (e) {
+            console.error('Failed to clear old message states:', e);
+            // Last resort: clear everything
+            messageStates.clear();
+            sessionStorage.removeItem(MESSAGE_STATE_KEY);
         }
     }
 
@@ -55,9 +140,9 @@
             return `msg-${turnElement.id}`;
         }
         
-        // Fallback to content hash
+        // Fallback to content hash (shorter)
         const content = element.textContent || '';
-        return `msg-${content.substring(0, 50).replace(/\s+/g, '-')}`;
+        return `msg-${content.substring(0, 30).replace(/\s+/g, '-')}`;
     }
 
     // Toggle message expansion
@@ -78,7 +163,13 @@
             element.classList.remove('aistudio-message-expanded');
         }
 
-        saveMessageStates();
+        // Debounce save to reduce storage writes
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+        }
+        debounceTimer = setTimeout(() => {
+            saveMessageStates();
+        }, 500);
     }
 
     // Process a single message element
@@ -96,11 +187,12 @@
         // Truncate text
         const truncatedText = truncateText(originalText, TRUNCATE_LENGTH);
         
-        // Store state
+        // Store state (limit text size)
         const state = {
-            originalText,
+            originalText: originalText.length > 1000 ? originalText.substring(0, 1000) + '...' : originalText,
             truncatedText,
-            isExpanded: false
+            isExpanded: false,
+            timestamp: Date.now()
         };
         messageStates.set(messageId, state);
 
@@ -116,7 +208,7 @@
             toggleMessage(element, messageId);
         });
 
-        saveMessageStates();
+        // Don't save immediately, let debounce handle it
     }
 
     // Find and process all user messages
@@ -138,6 +230,11 @@
             );
 
             userMessages.forEach(processMessage);
+            
+            // Save after processing all messages
+            setTimeout(() => {
+                saveMessageStates();
+            }, 100);
         }, DEBOUNCE_DELAY);
     }
 
@@ -159,6 +256,13 @@
 
     // Initialize message monitoring
     function init() {
+        // Clear any corrupted storage first
+        try {
+            sessionStorage.removeItem(MESSAGE_STATE_KEY);
+        } catch (e) {
+            console.warn('Failed to clear storage on init:', e);
+        }
+        
         // Load saved states
         loadMessageStates();
 
@@ -227,6 +331,13 @@
         setInterval(() => {
             restoreMessageStates();
         }, 2000);
+
+        // More frequent cleanup to prevent storage issues
+        setInterval(() => {
+            if (messageStates.size > 25) {
+                clearOldMessageStates();
+            }
+        }, 15000); // Every 15 seconds
     }
 
     // Clean up function
@@ -246,6 +357,7 @@
         init,
         cleanup,
         processUserMessages,
-        toggleMessage
+        toggleMessage,
+        clearOldMessageStates
     };
 })();
