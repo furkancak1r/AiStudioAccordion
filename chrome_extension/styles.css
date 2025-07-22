@@ -659,43 +659,7 @@
     height: 20px;
 }
 
-.markdown-sequential-send-btn-fwk {
-  background-color: var(--color-surface-container, #1c1b1f);
-  border: none;
-  border-radius: 20px;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--color-on-surface-variant, #c4c7c5);
-}
-
-.markdown-sequential-send-btn-fwk:hover {
-  background-color: var(--color-state-layer-on-surface-008, rgba(227, 227, 227, 0.08));
-  color: var(--color-on-surface, #e3e3e3);
-}
-
-.markdown-sequential-send-btn-fwk.processing {
-  background-color: var(--color-state-layer-primary-012, rgba(168, 201, 255, 0.12));
-  color: var(--color-primary, #a8c9ff);
-  animation: spin 1s linear infinite;
-}
-
-.markdown-sequential-send-btn-fwk:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.markdown-import-btn-fwk svg,
-.markdown-sequential-send-btn-fwk svg {
+.markdown-import-btn-fwk svg {
   width: 20px;
   height: 20px;
 }

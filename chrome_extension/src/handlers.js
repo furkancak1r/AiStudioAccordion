@@ -62,7 +62,7 @@ async function importFromClipboard() {
   }
 }
 
-async function sendToPrompt(index, sequential = false) {
+async function sendToPrompt(index) {
     const text = detectedSections[index];
     if (!text) return Promise.resolve();
   
@@ -79,19 +79,9 @@ async function sendToPrompt(index, sequential = false) {
         setTimeout(() => {
           if (!runButton.disabled) {
             runButton.click();
-            
-            if (!sequential) {
-              detectedSections.splice(index, 1);
-              renderSections();
-              resolve();
-            } else {
-              waitForAIResponse().then(() => {
-                resolve();
-              }).catch((error) => {
-                console.error('AI yanıt bekleme hatası:', error);
-                reject(error);
-              });
-            }
+            detectedSections.splice(index, 1);
+            renderSections();
+            resolve();
           } else {
             reject(new Error('Run button disabled'));
           }
@@ -103,55 +93,7 @@ async function sendToPrompt(index, sequential = false) {
     }
 }
 
-function waitForAIResponse() {
-    return new Promise((resolve, reject) => {
-        let attempts = 0;
-        const maxAttempts = 120; // 2 dakika bekle
-        const checkInterval = 500; // Her 500ms kontrol et
-        let responseDetected = false;
-        
-        const checkForResponse = () => {
-            attempts++;
-            
-            if (responseDetected) {
-                return;
-            }
-            
-            const runButton = document.querySelector('run-button button[type="submit"]');
-            
-            if (runButton) {
-                const isDisabled = runButton.hasAttribute('disabled') || runButton.getAttribute('aria-disabled') === 'true';
-                const buttonLabel = runButton.querySelector('.label');
-                const labelText = buttonLabel ? buttonLabel.textContent.trim() : '';
-                
-                const hasDisabledClass = runButton.classList.contains('disabled');
-                const hasNoTimerClass = runButton.classList.contains('no-timer');
-                
-                const isTyping = document.querySelector('div[data-testid="typing-indicator"]');
-                
-                if (isDisabled && labelText === 'Run' && !isTyping && hasDisabledClass && !responseDetected) {
-                    responseDetected = true;
-                    console.log('AI yanıt verdi, devam ediliyor...');
-                    
-                    setTimeout(() => {
-                        resolve();
-                    }, 2000);
-                    return;
-                }
-            }
-            
-            if (attempts >= maxAttempts) {
-                console.warn('AI yanıt timeout, devam ediliyor...');
-                resolve(); 
-                return;
-            }
-            
-            setTimeout(checkForResponse, checkInterval);
-        };
-        
-        checkForResponse();
-    });
-}
+
 
 function showPopup(message, type = 'info', title = 'Bilgi') {
     const existingPopups = document.querySelectorAll('.ai-popup-fwk');

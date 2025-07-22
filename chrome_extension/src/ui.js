@@ -191,9 +191,7 @@ importBtn.innerHTML = ICONS.clipboard;
 importBtn.title = 'Panodan İçe Aktar';
 importBtn.onclick = importFromClipboard;
 
-const sequentialBtn = createSequentialSendButton();
-
-footer.append(importBtn, sequentialBtn);
+footer.append(importBtn);
 sidebar.append(header, body, footer);
 
 const historyElement = document.querySelector('ms-prompt-history');
@@ -318,77 +316,7 @@ function createAnalyzeFilesButton() {
     return createMaterialIconButton('analyze', 'Dosyaları Analiz Et', sendAnalyzeFilesPrompt, 'analyze-files-btn-fwk');
 }
 
-function createSequentialSendButton() {
-    const btn = document.createElement('button');
-    btn.className = 'markdown-sequential-send-btn-fwk';
-    btn.innerHTML = ICONS.sequential;
-    btn.title = 'Aşamaları Sırayla Gönder';
-    btn.onclick = (e) => {
-        e.stopPropagation();
-        sendStagesSequentially();
-    };
-    return btn;
-}
 
-function sendStagesSequentially() {
-    if (detectedSections.length === 0) {
-        showPopup('Gönderilecek aşama bulunamadı!', 'warning', 'Uyarı');
-        return;
-    }
-
-    const button = document.querySelector('.markdown-sequential-send-btn-fwk');
-    if (!button) return;
-
-    let currentIndex = 0;
-    let isProcessing = false;
-
-    function updateButtonState(processing, text = '') {
-        if (processing) {
-            button.disabled = true;
-            button.classList.add('processing');
-            button.innerHTML = ICONS.loading;
-            button.title = text || 'Gönderiliyor...';
-        } else {
-            button.disabled = false;
-            button.classList.remove('processing');
-            button.innerHTML = ICONS.sequential;
-            button.title = 'Aşamaları Sırayla Gönder';
-        }
-    }
-
-    function sendNextStage() {
-        if (currentIndex >= detectedSections.length) {
-            updateButtonState(false);
-            detectedSections.splice(0, detectedSections.length);
-            renderSections();
-            showPopup('Tüm aşamalar başarıyla gönderildi!', 'success', 'İşlem Tamamlandı');
-            return;
-        }
-
-        const stage = detectedSections[currentIndex];
-        updateButtonState(true, `Aşama ${currentIndex + 1}/${detectedSections.length} gönderiliyor...`);
-
-        sendToPrompt(currentIndex, true).then(() => {
-            currentIndex++;
-            
-            setTimeout(() => {
-                if (currentIndex < detectedSections.length) {
-                    sendNextStage();
-                } else {
-                    updateButtonState(false);
-                    detectedSections.splice(0, detectedSections.length);
-                    renderSections();
-                    showPopup('Tüm aşamalar başarıyla gönderildi!', 'success', 'İşlem Tamamlandı');
-                }
-            }, 2000);
-        }).catch(() => {
-            updateButtonState(false);
-            showPopup(`Aşama ${currentIndex + 1} gönderilirken hata oluştu!`, 'error', 'Hata');
-        });
-    }
-
-    sendNextStage();
-}
 
 function showPopup(message, type = 'info', title = 'Bilgi') {
     const existingPopups = document.querySelectorAll('.ai-popup-fwk');
