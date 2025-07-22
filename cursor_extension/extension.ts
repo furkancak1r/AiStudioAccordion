@@ -3,34 +3,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 function cleanMarkdownCodeBlocks(content: string): string {
-	// Eğer içerik markdown kod bloğu değilse, olduğu gibi döndür
-	if (!content.includes('```')) {
-		return content;
-	}
-	
 	const lines = content.split(/\r?\n/);
 	
+	// Find the index of the first non-empty line.
 	const firstLineIndex = lines.findIndex(line => line.trim().length > 0);
-    const contentLines = lines.slice(firstLineIndex + 1);
+	if (firstLineIndex === -1) {
+		return ''; // Content is empty or just whitespace
+	}
 
-	const cleanedLines = contentLines
-		.filter(line => {
-			const trimmed = line.trim();
-			return !trimmed.match(/^```[a-zA-Z]*$/);
-		})
-		.map(line => {
-			return line.replace(/```$/, '');
-		});
+	// The code is everything after that first line (which is the path comment).
+	const codeLines = lines.slice(firstLineIndex + 1);
 	
-	while (cleanedLines.length > 0 && cleanedLines[0].trim() === '') {
-		cleanedLines.shift();
-	}
-	
-	while (cleanedLines.length > 0 && cleanedLines[cleanedLines.length - 1].trim() === '') {
-		cleanedLines.pop();
-	}
-	
-	return cleanedLines.join('\n');
+	return codeLines.join('\n');
 }
 
 async function handleUri(uri: vscode.Uri) {
@@ -119,7 +103,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const lines = clipboardContent.split(/\r?\n/);
 			const firstLine = lines[0];
-			const pathMatch = firstLine.match(/^(?:\/\/\s*(.+\.\w+)|#\s*(.+\.\w+)|\/\*\s*(.+\.\w+)\s*\*\/|<!--\s*(.+\.\w+)\s*-->|--\s*(.+\.\w+)|%\s*(.+\.\w+))/);
+			const pathMatch = firstLine.match(/^(?:\/\/\s*(.*)|#\s*(.*)|\/\*\s*(.*?)\s*\*\/|<!--\s*(.*?)\s*-->|--\s*(.*)|%\s*(.*))/);
 			
 			if (!pathMatch) {
 				vscode.window.showErrorMessage('İlk satırda dosya yolu bulunamadı.\nÖrnekler:\n// src/components/Layout.tsx\n# src/utils/helper.js\n/* src/styles/app.css */\n<!-- src/templates/page.html -->\n-- src/queries/data.sql\n% src/scripts/process.m');

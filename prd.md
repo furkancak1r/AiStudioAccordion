@@ -1,1 +1,0 @@
-go 3. GEMINI.md Dosyasının Güncellenmesi, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.
