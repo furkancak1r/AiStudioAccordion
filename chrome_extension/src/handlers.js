@@ -402,18 +402,25 @@ async function sendSelectedTextToPrompt(selectedText) {
   
   let promptText = `go ${selectedText}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
   
-  const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
-  const runButton = document.querySelector('run-button button[type="submit"]');
+  const textarea = document.querySelector('textarea[placeholder="Start typing a prompt"]') || 
+                   document.querySelector('textarea.textarea') ||
+                   document.querySelector('ms-autosize-textarea textarea');
+  const runButton = document.querySelector('run-button button[type="submit"]') ||
+                   document.querySelector('button[aria-label="Run"]') ||
+                   document.querySelector('.run-button');
   
   if (textarea && runButton) {
     textarea.value = promptText;
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    textarea.dispatchEvent(new Event('change', { bubbles: true }));
     
     setTimeout(() => {
       if (!runButton.disabled) {
         runButton.click();
+      } else {
+        console.log('Run butonu disabled, metin girişi tamamlandı');
       }
-    }, 100);
+    }, 200);
   } else {
     console.error('Prompt textarea veya run butonu bulunamadı.');
   }
