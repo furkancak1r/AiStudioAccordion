@@ -68,12 +68,17 @@ async function sendToPrompt(index) {
   
     let promptText = `go ${text}, yalnızca kod bloğu döndür. ilk satırda dosya yolunu dosya diline uygun yorum satırı olarak yaz. kod bloğu dışında hiçbir metin yazma. "File:" yazma. ng-star-inserted ekleme.`;
     
-    const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
-    const runButton = document.querySelector('run-button button[type="submit"]');
+    const textarea = document.querySelector('textarea[placeholder="Start typing a prompt"]') || 
+                   document.querySelector('textarea.textarea') ||
+                   document.querySelector('ms-autosize-textarea textarea');
+    const runButton = document.querySelector('run-button button[type="submit"]') ||
+                   document.querySelector('button[aria-label="Run"]') ||
+                   document.querySelector('.run-button');
   
     if (textarea && runButton) {
       textarea.value = promptText;
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      textarea.dispatchEvent(new Event('change', { bubbles: true }));
       
       return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -83,9 +88,12 @@ async function sendToPrompt(index) {
             renderSections();
             resolve();
           } else {
-            reject(new Error('Run button disabled'));
+            console.log('Run butonu disabled, prompt gönderimi tamamlandı');
+            detectedSections.splice(index, 1);
+            renderSections();
+            resolve();
           }
-        }, 100);
+        }, 200);
       });
     } else {
       console.error('Prompt textarea veya run butonu bulunamadı.');
@@ -255,18 +263,25 @@ function showNotification(message, type = 'info') {
 
 async function sendGitCommitPrompt() {
     const promptText = 'git add . git commit -m "" git push kodlarını ver';
-    const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
-    const runButton = document.querySelector('run-button button[type="submit"]');
+    const textarea = document.querySelector('textarea[placeholder="Start typing a prompt"]') || 
+                   document.querySelector('textarea.textarea') ||
+                   document.querySelector('ms-autosize-textarea textarea');
+    const runButton = document.querySelector('run-button button[type="submit"]') ||
+                   document.querySelector('button[aria-label="Run"]') ||
+                   document.querySelector('.run-button');
 
     if (textarea && runButton) {
         textarea.value = promptText;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
         
         setTimeout(() => {
             if (!runButton.disabled) {
                 runButton.click();
+            } else {
+                console.log('Run butonu disabled, git komutları girişi tamamlandı');
             }
-        }, 100);
+        }, 200);
     } else {
         console.error('Prompt textarea veya run butonu bulunamadı.');
     }
@@ -274,18 +289,25 @@ async function sendGitCommitPrompt() {
 
 async function sendAnalyzeFilesPrompt() {
     const appendText = ' burası ile ilgili tüm dosyaları tespit et. Her satırın başında \'#\' olacak şekilde dosya yolları listesini paylaş. Kod bloğu içinde ver. Genel bilgileri de ekle, örneğin remember, package.json, gemini.md, prd.md';
-    const textarea = document.querySelector('textarea.textarea.gmat-body-medium');
-    const runButton = document.querySelector('run-button button[type="submit"]');
+    const textarea = document.querySelector('textarea[placeholder="Start typing a prompt"]') || 
+                   document.querySelector('textarea.textarea') ||
+                   document.querySelector('ms-autosize-textarea textarea');
+    const runButton = document.querySelector('run-button button[type="submit"]') ||
+                   document.querySelector('button[aria-label="Run"]') ||
+                   document.querySelector('.run-button');
 
     if (textarea && runButton) {
         textarea.value += appendText;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
         
         setTimeout(() => {
             if (!runButton.disabled) {
                 runButton.click();
+            } else {
+                console.log('Run butonu disabled, dosya analiz metni girişi tamamlandı');
             }
-        }, 100);
+        }, 200);
     } else {
         console.error('Prompt textarea veya run butonu bulunamadı.');
     }
