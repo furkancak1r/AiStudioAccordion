@@ -395,6 +395,53 @@ Kullanıcı "git add . git commit -m … git push kodlarını ver" dediğinde:
     }, 1000);
   }
 
+  function truncateUserMessages() {
+    const userMessages = document.querySelectorAll('[data-turn-role="User"]');
+    userMessages.forEach(message => {
+      const turnContent = message.querySelector('.turn-content');
+      if (turnContent) {
+        const text = turnContent.textContent || turnContent.innerText;
+        const words = text.trim().split(/\s+/);
+        
+        if (words.length > 10) {
+          const truncatedText = words.slice(0, 10).join(' ');
+          turnContent.innerHTML = `<span>${truncatedText}...</span>`;
+        }
+      }
+    });
+  }
+
+  function setupUserMessageObserver() {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType !== 1) return;
+          
+          if (node.hasAttribute && node.hasAttribute('data-turn-role') && node.getAttribute('data-turn-role') === 'User') {
+            truncateUserMessages();
+          }
+          
+          if (node.querySelectorAll) {
+            const userMessages = node.querySelectorAll('[data-turn-role="User"]');
+            if (userMessages.length > 0) {
+              truncateUserMessages();
+            }
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Initial truncate on page load
+    setTimeout(() => {
+      truncateUserMessages();
+    }, 1000);
+  }
+
   const observer = new MutationObserver((mutations) => {
     initializeSidebar();
     
@@ -430,6 +477,7 @@ Kullanıcı "git add . git commit -m … git push kodlarını ver" dediğinde:
   loadIDEPreference(); // Load IDE preference on startup
   setupTextSelectionListener(); // Setup text selection listener
   setupSystemInstructionsObserver(); // Setup system instructions observer
+  setupUserMessageObserver(); // Setup user message hiding
   
   // Initialize message truncation
   if (window.AIStudioMessages) {
