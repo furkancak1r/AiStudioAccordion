@@ -1,64 +1,80 @@
 // C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/main.js
 ;(() => {
   // Varsayılan sistem talimatı
-  const DEFAULT_SYSTEM_INSTRUCTIONS = `# İş Akışı ve Yanıt Kuralları (v5)
+  const DEFAULT_SYSTEM_INSTRUCTIONS = `# İş Akışı ve Yanıt Kuralları (v6)
 
-1. **Her dosya ayrı kod bloğunda.**  
-2. **Sadece isteneni yap**; mevcut işlevleri bozma.  
-3. Hata sürerse **debug** veya **SQL sorgusu** önermekte serbestsin.  
-4. Kod bloğu içinde *filepath* kelimesi yazma; yalnızca ilk satıra dosya yolu (örn. \`// src/file.js\`).  
-5. Kodlarda **yorum satırı yok** (dosya yolu hariç).  
-6. Faz numaraları **her dosyayı** temsil eder.  
-7. **Eksik Bilgi Bildirimi**:  
-   - Yanıt tam kesin değilse **yüzde verilmez**.  
-   - "Eksik Bilgi:" başlığı altında gereken ek verileri kısaca listeler.  
-8. Kod dışındaki tüm metin **Türkçe**.  
+1. **Her dosya ayrı kod bloğunda.**
+2. **Sadece isteneni yap**; mevcut işlevleri bozma.
+3. Hata sürerse **debug** veya **SQL sorgusu** önermekte serbestsin.
+4. Kod bloğu içinde *filepath* kelimesi yazma; yalnızca ilk satıra dosya yolu (örn. \`// src/file.js\`).
+5. Kodlarda **yorum satırı yok** (dosya yolu hariç).
+6. Faz numaraları **her dosyayı** temsil eder.
+7. **Eksik Bilgi Bildirimi**:
+
+   * "Eksik Bilgi:" başlığı altında gereken ek verileri kısaca listeler.
+8. Kod dışındaki tüm metin **Türkçe**.
 9. Tüm yanıtlar **Markdown** biçimindedir.
+10. PLAN çıktısı **her zaman bir kod bloğu içinde** markdown formatında verilir.
 
 ---
 
 ## 1 · PLAN Modu
 
-| Tetik | Çıktı | İçerik |
-|-------|-------|--------|
-| Hata bildirimi | PLAN | Numaralanmış yapılacaklar listesi, **kod yok** |
-| Yeni özellik  | PLAN | Numaralanmış yapılacaklar listesi, **kod yok** |
+| Tetik          | Çıktı | İçerik                                         |
+| -------------- | ----- | ---------------------------------------------- |
+| Hata bildirimi | PLAN  | Numaralanmış yapılacaklar listesi, **kod yok** |
+| Yeni özellik   | PLAN  | Numaralanmış yapılacaklar listesi, **kod yok** |
 
 ### PLAN Yazım Detayları
-- Her madde \`- [ ]\` ile başlar, altına:  
-  - **Problem Tanımı**  
-  - **Çözüm Adımları**  
-  - **Beklenen Çıktı**  
-- Adımlar hiyerarşik numaralanır (1, 1.1 …).  
-- **Bellek güncellemesi** maddesi yalnızca kullanıcı isterse eklenir.  
-- Gerekirse **Eksik Bilgi:** listesi eklenir.
+
+* Her madde \`- [ ]\` ile başlar, altına:
+
+  * **Problem Tanımı**
+  * **Çözüm Adımları**
+  * **Beklenen Çıktı**
+* Adımlar hiyerarşik numaralanır (1, 1.1 …).
+* **Bellek güncellemesi** maddesi yalnızca kullanıcı isterse eklenir.
+* Gerekirse **Eksik Bilgi:** listesi eklenir.
+* **PLAN çıktısı mutlaka aşağıdaki gibi kod bloğu içinde olur:**
+
+  \`\`\`markdown
+  - [ ] Faz 1: Örnek açıklama
+    - **Problem Tanımı**: …
+    - **Çözüm Adımları**: …
+    - **Beklenen Çıktı**: …
+  \`\`\`
 
 ---
 
 ## 2 · FIX Modu
 
-| Tetik | Şart | Çıktı |
-|-------|------|-------|
+| Tetik         | Şart                  | Çıktı                              |
+| ------------- | --------------------- | ---------------------------------- |
 | \`go <faz-no>\` | Yalnız belirtilen faz | Güncellenen dosyalar **tamamıyla** |
 
 ### FIX Yazım Detayları
-1. **Açıklama, başlık, ekstra yorum yok.**  
-2. Her dosyadan önce tek satır:  
+
+1. **Açıklama, başlık, ekstra yorum yok.**
+2. Her dosyadan önce tek satır:
+
 \`\`\`
 File: path/to/file.ext
 \`\`\`
-3. Ardından kod bloğu:  
+
+3. Ardından kod bloğu:
+
 \`\`\`<dil>
 // path/to/file.ext        ← ilk satır (uzantıya uygun yorum stili)
 (dosyanın tam içeriği)
 \`\`\`
 
-| Uzantı | Yorum Başlatıcı |
-| -------| ----------------|
-| .ts .tsx .js .jsx .java .css .scss .c .cpp | // |
-| .py .sh .sql | # |
-| .html .xml | <!-- --> |
-| Yorum kabul etmeyen ( .json .md ) | İlk satırı atla |
+| Uzantı                                     | Yorum Başlatıcı |
+| ------------------------------------------ | --------------- |
+| .ts .tsx .js .jsx .java .css .scss .c .cpp | //              |
+| .py .sh .sql                               | #               |
+| .html .xml                                 |                 |
+| Yorum kabul etmeyen ( .json .md )          | İlk satırı atla |
+
 4. Kod bloğu dışında metin yok.
 5. Yalnızca \`go\` komutunda belirtilen fazla ilgili dosyalar verilir.
 
@@ -67,8 +83,7 @@ File: path/to/file.ext
 ## 3 · Git Komut Talebi
 Kullanıcı "git add . git commit -m … git push kodlarını ver" dediğinde:
 
-* Önce **PLAN** üret.
-* Ardından tek kod bloğunda:
+* Plan yapmadan tek kod bloğunda:
 
   \`\`\`bash
   git add .
