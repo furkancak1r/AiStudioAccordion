@@ -28,26 +28,22 @@ function createButton(iconKey, title, onClick, extraClass = '') {
 
 function createMaterialIconButton(iconKey, title, onClick, extraClass = '') {
   const btn = document.createElement('button');
-  btn.className = `mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-unthemed ${extraClass}`.trim();
-  btn.setAttribute('mat-icon-button', '');
-  btn.setAttribute('title', title);
+  btn.className = `mat-mdc-menu-trigger mat-mdc-tooltip-trigger icon ${extraClass}`.trim();
+  btn.setAttribute('ms-button', '');
+  btn.setAttribute('variant', 'icon');
   btn.setAttribute('aria-label', title);
-
-  const rippleSpan = document.createElement('span');
-  rippleSpan.className = 'mat-mdc-button-persistent-ripple mdc-icon-button__ripple';
+  btn.setAttribute('mattooltipposition', 'above');
 
   const iconSpan = document.createElement('span');
-  iconSpan.setAttribute('aria-hidden', 'true');
-  iconSpan.className = 'material-symbols-outlined notranslate';
-  iconSpan.innerHTML = window.ICONS?.[iconKey] || '';
+  iconSpan.className = 'ms-button-icon-wrapper';
+  
+  const iconInnerSpan = document.createElement('span');
+  iconInnerSpan.setAttribute('aria-hidden', 'true');
+  iconInnerSpan.className = 'material-symbols-outlined notranslate';
+  iconInnerSpan.innerHTML = window.ICONS?.[iconKey] || '';
 
-  const focusSpan = document.createElement('span');
-  focusSpan.className = 'mat-focus-indicator';
-
-  const touchSpan = document.createElement('span');
-  touchSpan.className = 'mat-mdc-button-touch-target';
-
-  btn.append(rippleSpan, iconSpan, focusSpan, touchSpan);
+  iconSpan.appendChild(iconInnerSpan);
+  btn.appendChild(iconSpan);
 
   btn.onclick = (e) => {
     e.stopPropagation();

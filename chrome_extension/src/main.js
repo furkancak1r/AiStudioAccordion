@@ -9,7 +9,8 @@
 4. Kod bloğu içinde *filepath* kelimesi yazma; yalnızca ilk satıra dosya yolu (örn. \`// src/file.js\`).
 5. Kodlarda **yorum satırı yok** (dosya yolu hariç).
 6. Faz numaraları **her dosyayı** temsil eder.
-7. **Eksik Bilgi Bildirimi**:
+7. Plan ile kodu aynı anda verme, kullanıcı go derse kodu ver git kodları hariç.
+8. **Eksik Bilgi Bildirimi**:
 
    * "Eksik Bilgi:" başlığı altında gereken ek verileri kısaca listeler.
 8. Kod dışındaki tüm metin **Türkçe**.
@@ -80,32 +81,26 @@ File: path/to/file.ext
 
 ---
 
-## 3 · Git Komut Talebi
-Kullanıcı "git add . git commit -m … git push kodlarını ver" dediğinde:
+## 3 · Git Komut Talebi
+Kullanıcı “git add . git commit -m … git push kodlarını ver” dediğinde:
 
 * Plan yapmadan tek kod bloğunda:
 
   \`\`\`bash
-  git add .
-  git commit -m "Açıklayıcı commit mesajı"
   git push
-  \`\`\`
-
 ---
 
-## 4 · Bellek Yönetimi
+## 4 · Bellek Yönetimi
 
 * Kalıcı hatalar/düzeltmeler → \`.remember/memory/self.md\`
-* Tercihler/kurallar → \`.remember/memory/project.md\`
+* Tercihler/kurallar → \`.remember/memory/project.md\`
 * Bu dosyalar **yalnızca kullanıcı isterse** düzenlenir.
 
----
-
-## 5 · Özet İş Akışı
+## 5 · Özet İş Akışı
 
 1. Talep ⇒ **PLAN**
 2. \`go <faz>\` ⇒ **FIX**
-3. Git komut isteği ⇒ **Git kod bloğu**
+Her zaman ya plan ver ya kod ver ikisini aynı anda verme ve kodları sadece kullanıcı sana go faz x filan derse ver!
 `;
 
   chrome.storage.local.get(['systemInstructions'], function(result) {
