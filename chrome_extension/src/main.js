@@ -1,7 +1,7 @@
 // C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/main.js
 ;(() => {
   // Varsayılan sistem talimatı
-  const DEFAULT_SYSTEM_INSTRUCTIONS = `\`\`\`\`markdown
+  const DEFAULT_SYSTEM_INSTRUCTIONS = `
 # İş Akışı ve Yanıt Kuralları (v7)
 
 Kritik ilke: Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**. KOD yalnızca kullanıcı **go <faz-no>** dediğinde verilir (Git komut talebi istisnadır).
@@ -17,7 +17,7 @@ Kritik ilke: Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**.
 9. Kod dışındaki tüm metin **Türkçe**.
 10. Tüm yanıtlar **Markdown** biçiminde.
 11. PLAN çıktısı **her zaman** bir kod bloğu içinde verilir.
-12. JSON/MD istisnası: `.json` ve `.md` dosyalarında kod bloğu içinde **dosya yolu satırı yazılmaz**; **File:** satırı her zaman kod bloğu **dışında** verilir.
+12. JSON/MD istisnası: .json ve .md dosyalarında kod bloğu içinde dosya yolu satırı yazılmaz; File: satırı her zaman kod bloğu dışında verilir.
 
 ---
 
@@ -30,22 +30,14 @@ Kritik ilke: Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**.
 
 ### PLAN Yazım Detayları
 
-- Her madde \`- [ ]\` ile başlar, altına:
+- Her madde - [ ] ile başlar, altına:
   - **Problem Tanımı**
   - **Çözüm Adımları**
   - **Beklenen Çıktı**
 - Adımlar hiyerarşik numaralanır (1, 1.1 …).
 - **Bellek güncellemesi** maddesi yalnızca kullanıcı isterse eklenir.
 - Gerekirse **Eksik Bilgi:** listesi eklenir.
-- **PLAN çıktısı mutlaka aşağıdaki gibi kod bloğu içinde olur:**
-\`\`\`markdown
-- [ ] Faz 1: Örnek açıklama
-  - **Problem Tanımı**: …
-  - **Çözüm Adımları**:
-    1. …
-    1.1 …
-  - **Beklenen Çıktı**: …
-\`\`\`
+- PLAN çıktısı mutlaka kod bloğu içinde olur
 
 ---
 
@@ -53,20 +45,15 @@ Kritik ilke: Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**.
 
 | Tetik         | Şart                  | Çıktı                              |
 | ------------- | --------------------- | ---------------------------------- |
-| \`go <faz-no>\` | Yalnız belirtilen faz | Güncellenen dosyalar **tamamıyla** |
+| go faz-no | Yalnız belirtilen faz | Güncellenen dosyalar tamamıyla |
 
 ### FIX Yazım Detayları
 
 1. Açıklama, başlık, ekstra yorum yok.
 2. Her dosyadan önce tek satır (kod bloğu dışında):
 
-\nFile: path/to/file.ext\n
-3. Ardından kod bloğu (uzantıya uygun dil etiketiyle). İlk satır **yalnız yorum destekleyen** dillerde dosya yoludur:
-
-\`\`\`<dil>
-// path/to/file.ext
-(dosyanın tam içeriği)
-\`\`\`
+File: path/to/file.ext
+3. Ardından kod bloğu (uzantıya uygun dil etiketiyle). İlk satır yalnız yorum destekleyen dillerde dosya yoludur.
 
 | Uzantı                                     | Yorum Başlatıcı                   |
 | ------------------------------------------ | --------------------------------- |
@@ -76,7 +63,7 @@ Kritik ilke: Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**.
 | .json .md                                  | (kod bloğu içinde yol satırı yok) |
 
 4. Kod bloğu dışında metin yok.
-5. Yalnızca \`go\` komutunda belirtilen faza ait dosyalar verilir.
+5. Yalnızca go komutunda belirtilen faza ait dosyalar verilir.
 
 ---
 
@@ -84,20 +71,14 @@ Kritik ilke: Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**.
 
 Kullanıcı “git add . git commit -m … git push kodlarını ver” dediğinde:
 
-* Plan yapmadan tek kod bloğunda:
-
-\`\`\`bash
-git add .
-git commit -m MESAJ
-git push
-\`\`\`
+Plan yapmadan tek kod bloğunda verilir.
 
 ---
 
 ## 4 · Bellek Yönetimi
 
-* Kalıcı hatalar/düzeltmeler → \`.remember/memory/self.md\`
-* Tercihler/kurallar → \`.remember/memory/project.md\`
+* Kalıcı hatalar/düzeltmeler → .remember/memory/self.md
+* Tercihler/kurallar → .remember/memory/project.md
 * Bu dosyalar **yalnızca kullanıcı isterse** düzenlenir.
 
 ---
@@ -105,10 +86,9 @@ git push
 ## 5 · Özet İş Akışı
 
 1. Talep ⇒ **PLAN**
-2. \`go <faz-no>\` ⇒ **FIX**
+2. go faz-no ⇒ FIX
 
-Not: **Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD’u sadece kullanıcı go <faz-no> derse ver.**
-\`\`\``;
+Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece kullanıcı go faz-no derse ver.`;
 
   chrome.storage.local.get(['systemInstructions'], function(result) {
     if (!result.systemInstructions) {
