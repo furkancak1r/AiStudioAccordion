@@ -499,6 +499,11 @@ Her zaman ya plan ver ya kod ver ikisini aynı anda verme ve kodları sadece kul
     window.AIStudioAccordion.init();
   }
   
+  // Initialize AI response monitor
+  if (window.AIResponseMonitor) {
+    window.AIResponseMonitor.start();
+  }
+  
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,

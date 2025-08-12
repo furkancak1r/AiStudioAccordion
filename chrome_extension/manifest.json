@@ -30,6 +30,7 @@
         "src/ui.js",
         "src/messages.js",
         "src/accordion.js",
+        "src/response-monitor.js",
         "src/main.js"
       ],
       "css": [
