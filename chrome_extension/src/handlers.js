@@ -80,20 +80,11 @@ async function sendToPrompt(index) {
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
       textarea.dispatchEvent(new Event('change', { bubbles: true }));
       
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (!runButton.disabled) {
-            runButton.click();
-            detectedSections.splice(index, 1);
-            renderSections();
-            resolve();
-          } else {
-            console.log('Run butonu disabled, prompt gönderimi tamamlandı');
-            detectedSections.splice(index, 1);
-            renderSections();
-            resolve();
-          }
-        }, 200);
+      return new Promise(async (resolve) => {
+        await clickRunWithRetry(runButton, 3, 1000);
+        detectedSections.splice(index, 1);
+        renderSections();
+        resolve();
       });
     } else {
       console.error('Prompt textarea veya run butonu bulunamadı.');
@@ -275,13 +266,7 @@ async function sendGitCommitPrompt() {
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
         textarea.dispatchEvent(new Event('change', { bubbles: true }));
         
-        setTimeout(() => {
-            if (!runButton.disabled) {
-                runButton.click();
-            } else {
-                console.log('Run butonu disabled, git komutları girişi tamamlandı');
-            }
-        }, 200);
+        await clickRunWithRetry(runButton, 3, 1000);
     } else {
         console.error('Prompt textarea veya run butonu bulunamadı.');
     }
@@ -301,18 +286,33 @@ async function sendAnalyzeFilesPrompt() {
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
         textarea.dispatchEvent(new Event('change', { bubbles: true }));
         
-        setTimeout(() => {
-            if (!runButton.disabled) {
-                runButton.click();
-            } else {
-                console.log('Run butonu disabled, dosya analiz metni girişi tamamlandı');
-            }
-        }, 200);
+        await clickRunWithRetry(runButton, 3, 1000);
     } else {
         console.error('Prompt textarea veya run butonu bulunamadı.');
     }
 }
 
+
+function clickRunWithRetry(runButton, maxAttempts = 3, delayMs = 1000) {
+  return new Promise((resolve) => {
+    let attempt = 0;
+    const tryClick = () => {
+      if (!runButton.disabled) {
+        runButton.click();
+        resolve(true);
+        return;
+      }
+      attempt += 1;
+      if (attempt >= maxAttempts) {
+        console.log('Run butonu hala disabled, denemeler bitti');
+        resolve(false);
+        return;
+      }
+      setTimeout(tryClick, delayMs);
+    };
+    setTimeout(tryClick, 200);
+  });
+}
 
 async function sendToVscode(event) {
   console.log('🚀 sendToVscode started');
@@ -436,13 +436,7 @@ async function sendSelectedTextToPrompt(selectedText) {
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
     textarea.dispatchEvent(new Event('change', { bubbles: true }));
     
-    setTimeout(() => {
-      if (!runButton.disabled) {
-        runButton.click();
-      } else {
-        console.log('Run butonu disabled, metin girişi tamamlandı');
-      }
-    }, 200);
+    await clickRunWithRetry(runButton, 3, 1000);
   } else {
     console.error('Prompt textarea veya run butonu bulunamadı.');
   }
