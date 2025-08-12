@@ -447,6 +447,44 @@
   animation: spin 1s linear infinite;
 }
 
+.markdown-vscode-btn-fwk,
+.actions-container .markdown-vscode-btn-fwk,
+.markdown-vscode-btn-fwk:hover,
+.markdown-vscode-btn-fwk:focus,
+.markdown-vscode-btn-fwk:active {
+  background: transparent !important;
+  border: none !important;
+}
+
+.markdown-vscode-btn-fwk .mat-mdc-button-persistent-ripple,
+.markdown-vscode-btn-fwk .mdc-icon-button__ripple,
+.markdown-vscode-btn-fwk .mat-mdc-button-touch-target {
+  display: none !important;
+  background: transparent !important;
+}
+
+.markdown-vscode-btn-fwk::before,
+.markdown-vscode-btn-fwk::after {
+  display: none !important;
+  background: transparent !important;
+}
+
+.markdown-vscode-btn-fwk {
+  cursor: pointer !important;
+  border-radius: 8px !important;
+  transition: box-shadow 0.15s ease, transform 0.05s ease !important;
+}
+
+.markdown-vscode-btn-fwk:hover,
+.markdown-vscode-btn-fwk:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(168, 201, 255, 0.35) !important;
+}
+
+.markdown-vscode-btn-fwk:active {
+  transform: scale(0.96) !important;
+}
+
 .markdown-copy-btn-fwk:disabled {
   background-color: var(--color-state-layer-success-012, rgba(153, 227, 153, 0.12));
   color: var(--color-success, #99e399);

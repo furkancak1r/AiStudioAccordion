@@ -260,13 +260,21 @@ function handleTextSelection() {
 }
 
 function enhanceActionBarWithVscodeButton(actionBar) {
-if (!actionBar || actionBar.dataset.vscodeBtnInjected === '1') {
-  return;
-}
+ if (!actionBar || actionBar.dataset.vscodeBtnInjected === '1') {
+   return;
+ }
 
-if (!actionBar.closest('ms-code-block')) {
-  return;
-}
+ // Yeni ve eski eylem konteynerlerini normalize et
+ const container = actionBar.classList.contains('actions') || actionBar.classList.contains('actions-container')
+   ? actionBar
+   : actionBar.closest('.actions, .actions-container');
+ if (!container) {
+   return;
+ }
+
+ if (!container.closest('ms-code-block')) {
+   return;
+ }
 
 const currentIDE = getSelectedIDE();
 const buttonTitle = currentIDE === 'cursor' ? 'Cursora Gönder' : 'VS Code\'a Gönder';
@@ -300,8 +308,8 @@ vscodeBtn.onclick = (e) => {
   sendToVscode(e);
 };
 
-actionBar.appendChild(vscodeBtn);
-actionBar.dataset.vscodeBtnInjected = '1';
+ container.appendChild(vscodeBtn);
+ container.dataset.vscodeBtnInjected = '1';
 }
 
 function createGitCommitButton() {

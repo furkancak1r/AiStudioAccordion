@@ -114,7 +114,7 @@ Her zaman ya plan ver ya kod ver ikisini aynı anda verme ve kodları sadece kul
   });
 
   function scanAndEnhanceActionBars() {
-    document.querySelectorAll('div.actions').forEach(enhanceActionBarWithVscodeButton);
+    document.querySelectorAll('div.actions, .actions-container').forEach(enhanceActionBarWithVscodeButton);
   }
 
   function enhancePromptInputArea(container) {
@@ -459,10 +459,10 @@ Her zaman ya plan ver ya kod ver ikisini aynı anda verme ve kodları sadece kul
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType !== 1) return;
 
-        if (node.matches && node.matches('div.actions')) {
+        if (node.matches && node.matches('div.actions, .actions-container')) {
           enhanceActionBarWithVscodeButton(node);
         } else if (node.querySelectorAll) {
-          node.querySelectorAll('div.actions').forEach(enhanceActionBarWithVscodeButton);
+          node.querySelectorAll('div.actions, .actions-container').forEach(enhanceActionBarWithVscodeButton);
         }
 
         if (node.matches && node.matches('div.prompt-input-wrapper-container')) {
