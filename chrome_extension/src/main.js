@@ -1,10 +1,12 @@
-// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/main.js
 ;(() => {
   // Varsayılan sistem talimatı
   const DEFAULT_SYSTEM_INSTRUCTIONS = `
-# İş Akışı ve Yanıt Kuralları (v7)
+# İş Akışı ve Yanıt Kuralları (v8)
 
-Kritik ilke: Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**. KOD yalnızca kullanıcı **go <faz-no>** dediğinde verilir (Git komut talebi istisnadır).
+Kritik ilkeler:
+- Her zaman **ya PLAN ver ya KOD ver**; **ikisini aynı anda verme**.
+- PLAN'da her faz **yalnızca tek bir dosyayı** ele almalıdır. Fazlar arası dosya tekrarı olamaz.
+- KOD yalnızca kullanıcı **go <faz-no>** dediğinde verilir (Git komut talebi istisnadır).
 
 1. Her dosya ayrı kod bloğunda.
 2. Sadece isteneni yap; mevcut işlevleri bozma.
@@ -496,3 +498,4 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
     subtree: true,
   });
 })();
+  

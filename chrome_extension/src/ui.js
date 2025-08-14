@@ -1,4 +1,14 @@
-// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/ui.js
+function truncatePath(path, segmentsToShow = 2) {
+  if (!path) return '';
+  // Yorum karakterlerini ve baştaki/sondaki boşlukları temizle
+  const cleanedPath = path.replace(/^(?:\/\/|#)\s*/, '').trim();
+  const parts = cleanedPath.split(/[\\/]/);
+  if (parts.length > segmentsToShow) {
+    return '.../' + parts.slice(-segmentsToShow).join('/');
+  }
+  return cleanedPath;
+}
+
 function truncateText(text, wordLimit = 2) {
   if (!text) return '';
   const words = text.split(' ');
@@ -119,7 +129,7 @@ textWrapper.className = 'markdown-section-text-fwk';
 
 const title = document.createElement('span');
 title.className = 'markdown-section-title-fwk';
-title.textContent = truncateText(section, 2);
+title.textContent = truncatePath(section, 2);
 
 textWrapper.append(title);
 
@@ -398,8 +408,6 @@ function showPopup(message, type = 'info', title = 'Bilgi') {
     popup.appendChild(footer);
     overlay.appendChild(popup);
     
-    document.body.appendChild(overlay);
-    
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' || e.key === 'Escape') {
             overlay.classList.add('fade-out');
@@ -479,3 +487,4 @@ function showNotification(message, type = 'info') {
         }
     }, 5000);
 }
+  

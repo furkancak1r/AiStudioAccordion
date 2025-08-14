@@ -383,6 +383,7 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 .markdown-section-item-fwk:hover .markdown-section-text-fwk {
     color: var(--color-on-surface, #e3e3e3);
@@ -397,7 +398,7 @@
 
 .markdown-section-actions-fwk {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   align-items: center;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -418,8 +419,8 @@
   color: var(--color-on-surface-variant, #c4c7c5);
   cursor: pointer;
   transition: all 0.2s ease;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -430,8 +431,8 @@
 .markdown-edit-btn-fwk svg,
 .markdown-delete-btn-fwk svg,
 .markdown-send-btn-fwk svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
 }
 
 .markdown-copy-btn-fwk:hover, .markdown-send-btn-fwk:hover { background-color: var(--color-state-layer-primary-012, rgba(168, 201, 255, 0.12)); color: var(--color-primary, #a8c9ff); }
@@ -1000,3 +1001,4 @@ ms-chat-turn:has([data-turn-role="User"]) {
 ms-chat-turn:has([data-turn-role="User"]):hover {
   opacity: 1;
 }
+  
