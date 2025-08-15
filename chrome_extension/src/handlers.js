@@ -1,4 +1,3 @@
-// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/src/handlers.js
 function addSection(content = '', startEditing = false) {
   if (isSidebarCollapsed) {
     toggleSidebar();
@@ -304,7 +303,6 @@ function clickRunWithRetry(runButton, maxAttempts = 3, delayMs = 1000) {
       }
       attempt += 1;
       if (attempt >= maxAttempts) {
-        console.log('Run butonu hala disabled, denemeler bitti');
         resolve(false);
         return;
       }
@@ -315,8 +313,6 @@ function clickRunWithRetry(runButton, maxAttempts = 3, delayMs = 1000) {
 }
 
 async function sendToVscode(event) {
-  console.log('🚀 sendToVscode started');
-  
   const button = event.currentTarget;
   const codeBlockElement = button.closest('ms-code-block');
   if (!codeBlockElement) {
@@ -369,11 +365,9 @@ async function sendToVscode(event) {
     let uri;
     if (fullCode.length > 1000) {
       uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}`;
-      console.log(`🚀 URI (${uriScheme}) açılıyor (clipboard mode): ${filePath} - ${fullCode.length} karakter`);
     } else {
       const encodedContent = encodeURIComponent(fullCode);
       uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
-      console.log(`🚀 URI (${uriScheme}) açılıyor (URI mode): ${filePath} - ${fullCode.length} karakter`);
     }
     
     window.open(uri, '_self');
@@ -441,3 +435,4 @@ async function sendSelectedTextToPrompt(selectedText) {
     console.error('Prompt textarea veya run butonu bulunamadı.');
   }
 }
+  

@@ -1,4 +1,5 @@
 ;(() => {
+  let systemPromptAutoApplied = false;
   // Varsayılan sistem talimatı
   const DEFAULT_SYSTEM_INSTRUCTIONS = `
 # İş Akışı ve Yanıt Kuralları (v8)
@@ -352,15 +353,41 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
   function applySystemInstructionsToTextarea() {
     const systemInstructionsTextarea = document.querySelector('textarea[aria-label="System instructions"]');
     if (!systemInstructionsTextarea) return;
-
+  
     Promise.all([window.getSystemInstructions(), getAutoApplySetting()]).then(([instructions, autoApply]) => {
       if (autoApply && instructions.trim() && !systemInstructionsTextarea.value.trim()) {
         systemInstructionsTextarea.value = instructions;
         systemInstructionsTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-      } else if (!autoApply) {
-        console.log('Otomatik uygulama kapalı, sistem talimatları uygulanmadı');
+        
+        setTimeout(() => {
+          const systemInstructionsButton = document.querySelector('button[aria-label="System instructions"]');
+          if (systemInstructionsButton) {
+            systemInstructionsButton.click();
+          }
+        }, 100);
+  
       }
     });
+  }
+
+  async function autoOpenAndApplySystemInstructions() {
+    if (systemPromptAutoApplied) {
+      return;
+    }
+  
+    const autoApply = await getAutoApplySetting();
+    if (!autoApply) {
+      systemPromptAutoApplied = true;
+      return;
+    }
+  
+    const systemInstructionsButton = document.querySelector('button[aria-label="System instructions"]');
+    const systemInstructionsTextarea = document.querySelector('textarea[aria-label="System instructions"]');
+  
+    if (systemInstructionsButton && !systemInstructionsTextarea) {
+      systemInstructionsButton.click();
+      systemPromptAutoApplied = true;
+    }
   }
 
   function setupSystemInstructionsObserver() {
@@ -369,11 +396,9 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType !== 1) return;
           
-          // Check if the added node is the system instructions textarea
           if (node.matches && node.matches('textarea[aria-label="System instructions"]')) {
             applySystemInstructionsToTextarea();
           } else if (node.querySelectorAll) {
-            // Check if any child contains the system instructions textarea
             const textarea = node.querySelector('textarea[aria-label="System instructions"]');
             if (textarea) {
               applySystemInstructionsToTextarea();
@@ -388,7 +413,6 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
       subtree: true
     });
 
-    // Also check on page load
     setTimeout(() => {
       applySystemInstructionsToTextarea();
     }, 1000);
@@ -435,7 +459,6 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
       subtree: true
     });
 
-    // Initial truncate on page load
     setTimeout(() => {
       truncateUserMessages();
     }, 1000);
@@ -443,6 +466,7 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
 
   const observer = new MutationObserver((mutations) => {
     initializeSidebar();
+    autoOpenAndApplySystemInstructions();
     
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
@@ -473,22 +497,19 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
   scanAndEnhanceActionBars();
   scanAndEnhancePromptInputs();
   scanAndConfigureModelSettings();
-  loadIDEPreference(); // Load IDE preference on startup
-  setupTextSelectionListener(); // Setup text selection listener
-  setupSystemInstructionsObserver(); // Setup system instructions observer
-  setupUserMessageObserver(); // Setup user message hiding
+  loadIDEPreference(); 
+  setupTextSelectionListener(); 
+  setupSystemInstructionsObserver(); 
+  setupUserMessageObserver(); 
   
-  // Initialize message truncation
   if (window.AIStudioMessages) {
     window.AIStudioMessages.init();
   }
   
-  // Initialize code block accordion
   if (window.AIStudioAccordion) {
     window.AIStudioAccordion.init();
   }
   
-  // Initialize AI response monitor
   if (window.AIResponseMonitor) {
     window.AIResponseMonitor.start();
   }
