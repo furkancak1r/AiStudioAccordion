@@ -37,15 +37,11 @@ function checkResponseStatus() {
   
   if (foundStatus !== currentResponseState) {
     if (currentResponseState === 'Stop' && foundStatus === 'Ctrl') {
-      console.log('AI yanıt verme tamamlandı, bildirim sesi çalıyor');
       playNotificationSound();
     }
     
     currentResponseState = foundStatus;
     
-    if (foundStatus) {
-      console.log('AI durumu:', foundStatus === 'Ctrl' ? 'Yanıt verildi' : 'Yanıt veriliyor');
-    }
   }
 }
 
@@ -85,7 +81,6 @@ function startResponseMonitoring() {
   
   setInterval(checkResponseStatus, 1000);
   
-  console.log('AI yanıt durumu izleme başlatıldı');
 }
 
 if (typeof window !== 'undefined') {
