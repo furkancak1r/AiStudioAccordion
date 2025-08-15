@@ -1,5 +1,4 @@
 ;(() => {
-  let systemPromptAutoApplied = false;
   // Varsayılan sistem talimatı
   const DEFAULT_SYSTEM_INSTRUCTIONS = `
 # İş Akışı ve Yanıt Kuralları (v8)
@@ -371,13 +370,15 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
   }
 
   async function autoOpenAndApplySystemInstructions() {
-    if (systemPromptAutoApplied) {
+    const promptContainer = document.querySelector('div.prompt-input-wrapper-container');
+    
+    if (!promptContainer || promptContainer.dataset.systemPromptOpened === 'true') {
       return;
     }
   
     const autoApply = await getAutoApplySetting();
     if (!autoApply) {
-      systemPromptAutoApplied = true;
+      promptContainer.dataset.systemPromptOpened = 'true';
       return;
     }
   
@@ -386,7 +387,7 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
   
     if (systemInstructionsButton && !systemInstructionsTextarea) {
       systemInstructionsButton.click();
-      systemPromptAutoApplied = true;
+      promptContainer.dataset.systemPromptOpened = 'true';
     }
   }
 
