@@ -203,6 +203,16 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
     if (document.querySelector('ms-app') && !document.querySelector('.markdown-sidebar-fwk')) {
       createSidebar();
       setupNavbarObserver();
+
+      const footer = document.querySelector('.markdown-sidebar-footer-fwk');
+      if (footer) {
+          const autoSendBtn = document.createElement('button');
+          autoSendBtn.className = 'markdown-autosend-btn-fwk markdown-import-btn-fwk';
+          autoSendBtn.innerHTML = ICONS.playAll;
+          autoSendBtn.title = 'Hepsini Gönder';
+          autoSendBtn.addEventListener('click', window.AIStudioHandlers.toggleAutoSend);
+          footer.appendChild(autoSendBtn);
+      }
     }
   }
 

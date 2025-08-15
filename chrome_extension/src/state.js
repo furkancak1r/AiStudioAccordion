@@ -1,7 +1,7 @@
-// chrome_extension/src/state.js
 let sidebar, body, clearAllBtn, toggleBtn, addStageBtn, header;
 let detectedSections = [];
 let isSidebarCollapsed = false;
+let isAutoSending = false;
 let selectedIDE = 'cursor'; // default
 const cacheKey = 'markdownCache';
 
@@ -112,3 +112,4 @@ function updateIDEButtons() {
     }
   });
 }
+  

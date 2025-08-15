@@ -1,3 +1,61 @@
+window.AIStudioHandlers = {};
+
+function updateAutoSendButtonState() {
+    const autoSendBtn = document.querySelector('.markdown-autosend-btn-fwk');
+    if (!autoSendBtn) return;
+
+    if (isAutoSending) {
+        autoSendBtn.innerHTML = ICONS.stop;
+        autoSendBtn.setAttribute('title', 'Durdur');
+        autoSendBtn.classList.add('active');
+    } else {
+        autoSendBtn.innerHTML = ICONS.playAll;
+        autoSendBtn.setAttribute('title', 'Hepsini Gönder');
+        autoSendBtn.classList.remove('active');
+    }
+}
+
+async function sendNextStage() {
+    if (isAutoSending && detectedSections.length > 0) {
+        await sendToPrompt(0);
+    } else if (isAutoSending && detectedSections.length === 0) {
+        stopAutoSend();
+        showNotification('Tüm aşamalar başarıyla gönderildi.', 'success');
+    }
+}
+
+function startAutoSend() {
+    if (detectedSections.length === 0) {
+        showPopup('Gönderilecek plan aşaması yok.', 'warning', 'Uyarı');
+        return;
+    }
+    isAutoSending = true;
+    updateAutoSendButtonState();
+    sendNextStage();
+}
+
+function stopAutoSend() {
+    isAutoSending = false;
+    updateAutoSendButtonState();
+}
+
+function toggleAutoSend() {
+    if (isAutoSending) {
+        stopAutoSend();
+    } else {
+        startAutoSend();
+    }
+}
+
+function handleResponseCompletion() {
+    if (isAutoSending) {
+        sendNextStage();
+    }
+}
+
+window.AIStudioHandlers.toggleAutoSend = toggleAutoSend;
+window.AIStudioHandlers.handleResponseCompletion = handleResponseCompletion;
+
 function addSection(content = '', startEditing = false) {
   if (isSidebarCollapsed) {
     toggleSidebar();

@@ -1,4 +1,3 @@
-// chrome_extension/src/response-monitor.js
 let currentResponseState = null;
 let notificationAudio = null;
 
@@ -48,6 +47,9 @@ function checkResponseStatus() {
   if (foundStatus !== currentResponseState) {
     if (currentResponseState === 'Stop' && foundStatus === 'Ctrl') {
       playNotificationSound();
+      if (window.AIStudioHandlers && typeof window.AIStudioHandlers.handleResponseCompletion === 'function') {
+        window.AIStudioHandlers.handleResponseCompletion();
+      }
     }
     
     currentResponseState = foundStatus;
@@ -99,3 +101,4 @@ if (typeof window !== 'undefined') {
     playSound: playNotificationSound
   };
 }
+  

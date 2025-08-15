@@ -510,6 +510,20 @@
   color: var(--color-on-surface, #e3e3e3);
 }
 
+.markdown-autosend-btn-fwk {
+  color: var(--color-primary, #a8c9ff);
+}
+.markdown-autosend-btn-fwk:hover {
+  background-color: var(--color-state-layer-primary-008, rgba(168, 201, 255, 0.08));
+}
+.markdown-autosend-btn-fwk.active {
+  color: var(--color-error, #f2b9b6);
+  background-color: var(--color-state-layer-error-012, rgba(242, 185, 182, 0.12));
+}
+.markdown-autosend-btn-fwk.active:hover {
+  background-color: var(--color-state-layer-error-024, rgba(242, 185, 182, 0.24));
+}
+
 
 .markdown-sidebar-empty-fwk {
   text-align: left;
