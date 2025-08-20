@@ -38,9 +38,9 @@ function createButton(iconKey, title, onClick, extraClass = '') {
 
 function createMaterialIconButton(iconKey, title, onClick, extraClass = '') {
   const btn = document.createElement('button');
-  btn.className = `mat-mdc-menu-trigger mat-mdc-tooltip-trigger icon ${extraClass}`.trim();
+  btn.className = `mat-mdc-menu-trigger mat-mdc-tooltip-trigger ms-button-borderless ms-button-icon ${extraClass}`.trim();
   btn.setAttribute('ms-button', '');
-  btn.setAttribute('variant', 'icon');
+  btn.setAttribute('variant', 'icon-borderless');
   btn.setAttribute('aria-label', title);
   btn.setAttribute('mattooltipposition', 'above');
 
@@ -330,6 +330,9 @@ function createAnalyzeFilesButton() {
     return createMaterialIconButton('analyze', 'Dosyaları Analiz Et', sendAnalyzeFilesPrompt, 'analyze-files-btn-fwk');
 }
 
+function createReevaluateButton() {
+    return createMaterialIconButton('reevaluate', 'Çözümü Yeniden Değerlendir', sendReevaluatePrompt, 'reevaluate-btn-fwk');
+}
 
 
 function showPopup(message, type = 'info', title = 'Bilgi') {

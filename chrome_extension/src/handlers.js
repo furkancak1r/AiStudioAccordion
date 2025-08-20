@@ -349,6 +349,26 @@ async function sendAnalyzeFilesPrompt() {
     }
 }
 
+async function sendReevaluatePrompt() {
+    const promptText = "plan yapma, kod yazma, konu hakkında konuş, yine olmadı bu çözümde, ne eksik biliyorsun neyi bilsen sorun çözülür?";
+    const textarea = document.querySelector('textarea[placeholder="Start typing a prompt"]') || 
+                   document.querySelector('textarea.textarea') ||
+                   document.querySelector('ms-autosize-textarea textarea');
+    const runButton = document.querySelector('run-button button[type="submit"]') ||
+                   document.querySelector('button[aria-label="Run"]') ||
+                   document.querySelector('.run-button');
+
+    if (textarea && runButton) {
+        textarea.value = promptText;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        await clickRunWithRetry(runButton, 3, 1000);
+    } else {
+        console.error('Prompt textarea veya run butonu bulunamadı.');
+    }
+}
+
 
 function clickRunWithRetry(runButton, maxAttempts = 3, delayMs = 1000) {
   return new Promise((resolve) => {

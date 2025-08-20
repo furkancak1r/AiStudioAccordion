@@ -700,18 +700,6 @@
   word-wrap: break-word;
 }
 
-.git-commit-btn-fwk,
-.analyze-files-btn-fwk {
-    width: 36px !important;
-    height: 36px !important;
-    transition: background-color 0.2s ease !important;
-}
-
-.git-commit-btn-fwk:hover,
-.analyze-files-btn-fwk:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
 .markdown-import-btn-fwk svg {
   width: 20px;
   height: 20px;

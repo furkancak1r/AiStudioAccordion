@@ -128,10 +128,17 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
     analyzeButtonWrapper.className = 'button-wrapper';
     analyzeButtonWrapper.appendChild(analyzeButton);
 
+    // Reevaluate Button
+    const reevaluateButton = createReevaluateButton();
+    const reevaluateButtonWrapper = document.createElement('div');
+    reevaluateButtonWrapper.className = 'button-wrapper';
+    reevaluateButtonWrapper.appendChild(reevaluateButton);
+
     const runButtonParentWrapper = runButtonWrapper.closest('.button-wrapper');
     if (runButtonParentWrapper) {
       container.insertBefore(gitButtonWrapper, runButtonParentWrapper);
       container.insertBefore(analyzeButtonWrapper, runButtonParentWrapper);
+      container.insertBefore(reevaluateButtonWrapper, runButtonParentWrapper);
       container.dataset.promptEnhanced = '1';
     }
   }
