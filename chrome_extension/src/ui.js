@@ -42,6 +42,7 @@ function createMaterialIconButton(iconKey, title, onClick, extraClass = '') {
   btn.setAttribute('ms-button', '');
   btn.setAttribute('variant', 'icon-borderless');
   btn.setAttribute('aria-label', title);
+  btn.title = title;
   btn.setAttribute('mattooltipposition', 'above');
 
   const iconSpan = document.createElement('span');
