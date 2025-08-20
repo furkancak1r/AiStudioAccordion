@@ -18,20 +18,18 @@ function updateAutoSendButtonState() {
 async function sendNextStage() {
     if (isAutoSending && detectedSections.length > 0) {
         await sendToPrompt(0);
-    } else if (isAutoSending && detectedSections.length === 0) {
-        stopAutoSend();
-        showNotification('Tüm aşamalar başarıyla gönderildi.', 'success');
     }
 }
 
 function startAutoSend() {
+    window.AIResponseMonitor.primeAudio();
     if (detectedSections.length === 0) {
         showPopup('Gönderilecek plan aşaması yok.', 'warning', 'Uyarı');
         return;
     }
     isAutoSending = true;
     updateAutoSendButtonState();
-    sendNextStage();
+    sendToPrompt(0);
 }
 
 function stopAutoSend() {
@@ -48,13 +46,27 @@ function toggleAutoSend() {
 }
 
 function handleResponseCompletion() {
-    if (isAutoSending) {
-        sendNextStage();
+    if (isAutoSendingActive()) {
+        if (detectedSections.length === 0) {
+            stopAutoSend();
+            window.AIResponseMonitor.playCompletionSound();
+            showNotification('Tüm aşamalar başarıyla gönderildi.', 'success');
+        } else {
+            window.AIResponseMonitor.playSound();
+            sendNextStage();
+        }
+    } else {
+        window.AIResponseMonitor.playSound();
     }
+}
+
+function isAutoSendingActive() {
+    return isAutoSending;
 }
 
 window.AIStudioHandlers.toggleAutoSend = toggleAutoSend;
 window.AIStudioHandlers.handleResponseCompletion = handleResponseCompletion;
+window.AIStudioHandlers.isAutoSendingActive = isAutoSendingActive;
 
 function addSection(content = '', startEditing = false) {
   if (isSidebarCollapsed) {

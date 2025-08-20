@@ -1,36 +1,79 @@
 let currentResponseState = null;
 let notificationAudio = null;
+let completionAudio = null;
+
+function createAudioFromData(dataUri, name) {
+    if (!dataUri || dataUri.endsWith('xxx')) {
+        return null;
+    }
+    
+    const audio = new Audio();
+    audio.onerror = (e) => {
+        console.error(`${name} sesi yüklenemedi.`, e);
+    };
+    audio.src = dataUri;
+    audio.load();
+    
+    return audio;
+}
 
 function initNotificationSound() {
-  try {
-    // Wait a bit for notification-sound.js to load
-    const checkAudioData = () => {
-      if (typeof window !== 'undefined' && window.notificationAudioData) {
-        notificationAudio = new Audio(window.notificationAudioData);
-        notificationAudio.volume = 0.5;
-        console.log('Bildirim sesi başarıyla yüklendi.');
-      } else {
-        console.warn('Bildirim sesi verisi bulunamadı.');
-      }
-    };
-    
-    // Check immediately and after a short delay
-    checkAudioData();
-    setTimeout(checkAudioData, 100);
-  } catch (error) {
-    console.warn('Bildirim sesi yüklenemedi:', error);
-  }
+    if (typeof window !== 'undefined') {
+        notificationAudio = createAudioFromData(window.notificationAudioData, 'Bildirim Sesi');
+        if (notificationAudio) {
+            notificationAudio.volume = 0.5;
+        }
+
+        completionAudio = createAudioFromData(window.completionAudioData, 'Tamamlanma Sesi');
+        if (completionAudio) {
+            completionAudio.volume = 0.5;
+        }
+    }
 }
 
 function playNotificationSound() {
   if (notificationAudio) {
     try {
       notificationAudio.currentTime = 0;
-      notificationAudio.play().catch(e => console.warn('Ses çalamadı:', e));
+      notificationAudio.play().catch(e => console.warn('Bildirim sesi çalamadı:', e));
     } catch (error) {
-      console.warn('Ses çalma hatası:', error);
+      console.warn('Bildirim sesi çalma hatası:', error);
     }
   }
+}
+
+function playCompletionSound() {
+  if (completionAudio) {
+    try {
+      completionAudio.currentTime = 0;
+      completionAudio.play().catch(e => console.warn('Tamamlanma sesi çalamadı:', e));
+    } catch (error) {
+      console.warn('Tamamlanma sesi çalma hatası:', error);
+    }
+  }
+}
+
+function primeAudio() {
+  const prime = (audio) => {
+    if (audio) {
+      const originalVolume = audio.volume;
+      audio.volume = 0;
+      const playPromise = audio.play();
+
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = originalVolume;
+        }).catch(() => {
+          audio.volume = originalVolume;
+        });
+      }
+    }
+  };
+
+  prime(notificationAudio);
+  prime(completionAudio);
 }
 
 function checkResponseStatus() {
@@ -46,7 +89,6 @@ function checkResponseStatus() {
   
   if (foundStatus !== currentResponseState) {
     if (currentResponseState === 'Stop' && foundStatus === 'Ctrl') {
-      playNotificationSound();
       if (window.AIStudioHandlers && typeof window.AIStudioHandlers.handleResponseCompletion === 'function') {
         window.AIStudioHandlers.handleResponseCompletion();
       }
@@ -98,7 +140,9 @@ function startResponseMonitoring() {
 if (typeof window !== 'undefined') {
   window.AIResponseMonitor = {
     start: startResponseMonitoring,
-    playSound: playNotificationSound
+    playSound: playNotificationSound,
+    playCompletionSound: playCompletionSound,
+    primeAudio: primeAudio
   };
 }
   
