@@ -271,56 +271,52 @@ function handleTextSelection() {
 }
 
 function enhanceActionBarWithVscodeButton(actionBar) {
- if (!actionBar || actionBar.dataset.vscodeBtnInjected === '1') {
-   return;
- }
+  const codeBlock = actionBar.closest('ms-code-block');
+  if (!codeBlock || codeBlock.dataset.vscodeBtnInjected === '1') {
+    return;
+  }
 
- // Yeni ve eski eylem konteynerlerini normalize et
- const container = actionBar.classList.contains('actions') || actionBar.classList.contains('actions-container')
-   ? actionBar
-   : actionBar.closest('.actions, .actions-container');
- if (!container) {
-   return;
- }
+  const container = actionBar.classList.contains('actions') || actionBar.classList.contains('actions-container')
+    ? actionBar
+    : actionBar.closest('.actions, .actions-container');
+  if (!container) {
+    return;
+  }
 
- if (!container.closest('ms-code-block')) {
-   return;
- }
+  const currentIDE = getSelectedIDE();
+  const buttonTitle = currentIDE === 'cursor' ? 'Cursora Gönder' : 'VS Code\'a Gönder';
 
-const currentIDE = getSelectedIDE();
-const buttonTitle = currentIDE === 'cursor' ? 'Cursora Gönder' : 'VS Code\'a Gönder';
+  const vscodeBtn = document.createElement('button');
+  vscodeBtn.className = 'markdown-vscode-btn-fwk mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-mdc-tooltip-trigger mat-unthemed';
+  vscodeBtn.setAttribute('mat-icon-button', '');
+  vscodeBtn.setAttribute('title', buttonTitle);
 
-const vscodeBtn = document.createElement('button');
-vscodeBtn.className = 'markdown-vscode-btn-fwk mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-mdc-tooltip-trigger mat-unthemed';
-vscodeBtn.setAttribute('mat-icon-button', '');
-vscodeBtn.setAttribute('title', buttonTitle);
+  const rippleSpan = document.createElement('span');
+  rippleSpan.className = 'mat-mdc-button-persistent-ripple mdc-icon-button__ripple';
 
-const rippleSpan = document.createElement('span');
-rippleSpan.className = 'mat-mdc-button-persistent-ripple mdc-icon-button__ripple';
+  const iconSpan = document.createElement('span');
+  iconSpan.setAttribute('aria-hidden', 'true');
+  iconSpan.className = 'material-symbols-outlined notranslate';
+  iconSpan.innerHTML = window.ICONS?.vscode || `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`;
 
-const iconSpan = document.createElement('span');
-iconSpan.setAttribute('aria-hidden', 'true');
-iconSpan.className = 'material-symbols-outlined notranslate';
-iconSpan.innerHTML = window.ICONS?.vscode || `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`;
+  const focusSpan = document.createElement('span');
+  focusSpan.className = 'mat-focus-indicator';
 
-const focusSpan = document.createElement('span');
-focusSpan.className = 'mat-focus-indicator';
+  const touchSpan = document.createElement('span');
+  touchSpan.className = 'mat-mdc-button-touch-target';
 
-const touchSpan = document.createElement('span');
-touchSpan.className = 'mat-mdc-button-touch-target';
+  vscodeBtn.appendChild(rippleSpan);
+  vscodeBtn.appendChild(iconSpan);
+  vscodeBtn.appendChild(focusSpan);
+  vscodeBtn.appendChild(touchSpan);
 
-vscodeBtn.appendChild(rippleSpan);
-vscodeBtn.appendChild(iconSpan);
-vscodeBtn.appendChild(focusSpan);
-vscodeBtn.appendChild(touchSpan);
+  vscodeBtn.onclick = (e) => {
+    e.stopPropagation();
+    sendToVscode(e);
+  };
 
-vscodeBtn.onclick = (e) => {
-  e.stopPropagation();
-  sendToVscode(e);
-};
-
- container.appendChild(vscodeBtn);
- container.dataset.vscodeBtnInjected = '1';
+  container.appendChild(vscodeBtn);
+  codeBlock.dataset.vscodeBtnInjected = '1';
 }
 
 function createGitCommitButton() {

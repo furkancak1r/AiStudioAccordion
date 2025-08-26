@@ -111,7 +111,7 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
       return;
     }
 
-    const runButtonWrapper = container.querySelector('run-button');
+    const runButtonWrapper = container.querySelector('ms-run-button');
     if (!runButtonWrapper) {
       return;
     }
