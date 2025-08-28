@@ -417,10 +417,16 @@ async function sendToVscode(event) {
   }
   
   const iconSpan = button.querySelector('.material-symbols-outlined');
-  const originalIconHTML = iconSpan ? iconSpan.innerHTML : '';
+  // Persist original icon once so it doesn't get lost after state changes
+  if (iconSpan && !button._originalIconHTML) {
+    button._originalIconHTML = iconSpan.innerHTML;
+  }
+  const originalIconHTML = button._originalIconHTML || (iconSpan ? iconSpan.innerHTML : '');
 
   try {
     if (iconSpan) iconSpan.textContent = 'sync';
+    button.dataset.sending = '1';
+    button.disabled = true;
     
     const fullCode = await window.AIStudioAccordion.forceLoadAndGetContent(preElement, button);
     
@@ -463,17 +469,32 @@ async function sendToVscode(event) {
     window.open(uri, '_self');
 
     if (iconSpan) {
-        iconSpan.textContent = 'check';
+      // Mark as sent and keep the "check" icon visible
+      iconSpan.textContent = 'check';
+      button.dataset.sent = '1';
+      button.disabled = false;
+      delete button.dataset.sending;
 
-        setTimeout(() => {
-          iconSpan.innerHTML = originalIconHTML;
-          button.disabled = false;
-        }, 2000);
+      // Attach hover handlers once to temporarily show original icon
+      if (!button._hoverHandlersAttached) {
+        button.addEventListener('mouseenter', () => {
+          if (button.dataset.sent === '1' && !button.dataset.sending && button._originalIconHTML && iconSpan) {
+            iconSpan.innerHTML = button._originalIconHTML;
+          }
+        });
+        button.addEventListener('mouseleave', () => {
+          if (button.dataset.sent === '1' && !button.dataset.sending && iconSpan) {
+            iconSpan.textContent = 'check';
+          }
+        });
+        button._hoverHandlersAttached = true;
+      }
     }
   } catch (error) {
     console.error('❌ URI açma veya panoya kopyalama hatası:', error);
     showPopup('İşlem başarısız: ' + error.message + '\n\nTarayıcı konsolunu kontrol edin (F12).', 'error', 'Hata');
     button.disabled = false;
+    delete button.dataset.sending;
     if (iconSpan) iconSpan.innerHTML = originalIconHTML;
   }
 }
