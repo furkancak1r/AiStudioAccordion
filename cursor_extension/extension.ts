@@ -65,8 +65,12 @@ async function handleUri(uri: vscode.Uri) {
 		
 		fs.writeFileSync(targetPath, cleanedContent, 'utf-8');
 		
-		const document = await vscode.workspace.openTextDocument(targetPath);
-		await vscode.window.showTextDocument(document);
+    const document = await vscode.workspace.openTextDocument(targetPath);
+    await vscode.window.showTextDocument(document, {
+      preview: false,
+      preserveFocus: false,
+      viewColumn: vscode.ViewColumn.Active,
+    });
 		
 		vscode.window.showInformationMessage(`✅ Kod ${filePath} dosyasına yazıldı ve açıldı`);
 
@@ -139,8 +143,12 @@ export function activate(context: vscode.ExtensionContext) {
 			
 			fs.writeFileSync(targetPath, cleanedContent, 'utf-8');
 			
-			const document = await vscode.workspace.openTextDocument(targetPath);
-			await vscode.window.showTextDocument(document);
+            const document = await vscode.workspace.openTextDocument(targetPath);
+            await vscode.window.showTextDocument(document, {
+                preview: false,
+                preserveFocus: false,
+                viewColumn: vscode.ViewColumn.Active,
+            });
 			
 			vscode.window.showInformationMessage(`✅ Kod ${extractedPath} dosyasına yazıldı ve açıldı`);
 			
