@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const autoApplyToggle = document.getElementById('autoApplyToggle');
     
     chrome.storage.local.get([STORAGE_KEY, SYSTEM_INSTRUCTIONS_KEY, AUTO_APPLY_KEY], function(result) {
-        const selectedIDE = result[STORAGE_KEY] || 'cursor';
+        const selectedIDE = result[STORAGE_KEY] || 'vscode';
         updateSelectedVisuals(selectedIDE);
         
         if (result[SYSTEM_INSTRUCTIONS_KEY] && systemInstructionsTextarea) {

@@ -2,7 +2,7 @@ let sidebar, body, clearAllBtn, toggleBtn, addStageBtn, header;
 let detectedSections = [];
 let isSidebarCollapsed = false;
 let isAutoSending = false;
-let selectedIDE = 'cursor'; // default
+let selectedIDE = 'vscode'; // default
 const cacheKey = 'markdownCache';
 
 // Text selection variables
