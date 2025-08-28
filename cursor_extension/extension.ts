@@ -157,7 +157,120 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	context.subscriptions.push(statusBarItem, uriHandler, pasteCommand);
+    // Copy Problems (Diagnostics) with code snippets
+    const copyProblemsCommand = vscode.commands.registerCommand('aistudiocopy.copyProblemsWithCode', async () => {
+        try {
+            // Always use workspace scope (no prompt)
+            const scope = { label: 'Entire workspace', value: 'workspace' } as const;
+
+            const workspaceFolders = vscode.workspace.workspaceFolders;
+            const workspaceRoot = workspaceFolders && workspaceFolders.length > 0 ? workspaceFolders[0].uri.fsPath : undefined;
+            const relPath = (uri: vscode.Uri) => {
+                if (workspaceRoot) {
+                    try { return path.relative(workspaceRoot, uri.fsPath) || uri.fsPath; } catch { return uri.fsPath; }
+                }
+                return uri.fsPath;
+            };
+
+            const severityText = (s: vscode.DiagnosticSeverity) => {
+                switch (s) {
+                    case vscode.DiagnosticSeverity.Error: return 'Error';
+                    case vscode.DiagnosticSeverity.Warning: return 'Warning';
+                    case vscode.DiagnosticSeverity.Information: return 'Info';
+                    case vscode.DiagnosticSeverity.Hint: return 'Hint';
+                    default: return 'Unknown';
+                }
+            };
+
+            // Proactively load workspace files so diagnostics include closed files
+            const includeGlobs = [
+                '**/*.{ts,tsx,js,jsx,vue,svelte,css,scss,less,html,md,markdown,json,jsonc}',
+                '**/*.{py,java,kt,cs,cpp,c,h,hpp,mm,m,swift,rs,go,rb,php}',
+                '**/*.{xml,yml,yaml,toml,ini,gradle,cmake,make,mak,sql,sh,bat,ps1}'
+            ];
+            const excludeGlob = '{**/.git/**,**/node_modules/**,**/dist/**,**/build/**,**/out/**,**/.next/**,**/.venv/**,**/__pycache__/**,**/.mypy_cache/**,**/.turbo/**,**/.cache/**}';
+
+            const discoverUris: vscode.Uri[] = [];
+            for (const g of includeGlobs) {
+                const found = await vscode.workspace.findFiles(g, excludeGlob);
+                discoverUris.push(...found);
+            }
+
+            // Open in small batches to trigger LSP diagnostics without UI
+            const batchSize = 20;
+            for (let i = 0; i < discoverUris.length; i += batchSize) {
+                const batch = discoverUris.slice(i, i + batchSize);
+                await Promise.all(batch.map(u => vscode.workspace.openTextDocument(u).then(() => undefined, () => undefined)));
+            }
+
+            // Small delay to allow providers to compute diagnostics
+            const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+            await wait(600);
+
+            type Item = { uri: vscode.Uri; diagnostic: vscode.Diagnostic };
+            let items: Item[] = [];
+
+            // Workspace diagnostics only
+            for (const [uri, diags] of vscode.languages.getDiagnostics()) {
+                for (const d of diags) items.push({ uri, diagnostic: d });
+            }
+
+            if (items.length === 0) {
+                vscode.window.showInformationMessage('No problems found to copy.');
+                return;
+            }
+
+            // Load documents (cache per file)
+            const docCache = new Map<string, vscode.TextDocument>();
+            const getDoc = async (uri: vscode.Uri) => {
+                const key = uri.toString();
+                const cached = docCache.get(key);
+                if (cached) return cached;
+                const doc = await vscode.workspace.openTextDocument(uri);
+                docCache.set(key, doc);
+                return doc;
+            };
+
+            const parts: string[] = [];
+            for (const { uri, diagnostic } of items) {
+                let text = '';
+                try {
+                    const doc = await getDoc(uri);
+                    // Include one line before and after the diagnostic range
+                    const startLine = Math.max(0, diagnostic.range.start.line - 1);
+                    const endLine = Math.min(doc.lineCount - 1, diagnostic.range.end.line + 1);
+                    const startPos = new vscode.Position(startLine, 0);
+                    const endPos = new vscode.Position(endLine, doc.lineAt(endLine).text.length);
+                    text = doc.getText(new vscode.Range(startPos, endPos));
+                } catch {
+                    // ignore failures to open doc
+                }
+
+                const pos = diagnostic.range.start;
+                const loc = `${relPath(uri)}:${pos.line + 1}:${pos.character + 1}`;
+                const sev = severityText(diagnostic.severity);
+                const src = diagnostic.source ? ` ${diagnostic.source}` : '';
+                const code = typeof diagnostic.code === 'object' && diagnostic.code !== null
+                    ? (diagnostic.code as any).value ?? ''
+                    : (diagnostic.code ?? '');
+                const codeStr = code ? ` (${code})` : '';
+
+                parts.push(
+                    `${loc} [${sev}] ${diagnostic.message}${src}${codeStr}`,
+                    text ? `${text}` : '',
+                    '———'
+                );
+            }
+
+            const output = parts.join('\n');
+            await vscode.env.clipboard.writeText(output);
+            vscode.window.showInformationMessage(`Copied ${items.length} problem(s) with code to clipboard.`);
+        } catch (err) {
+            vscode.window.showErrorMessage(`Copy Problems failed: ${err}`);
+        }
+    });
+
+	context.subscriptions.push(statusBarItem, uriHandler, pasteCommand, copyProblemsCommand);
 }
 
 export function deactivate() {}

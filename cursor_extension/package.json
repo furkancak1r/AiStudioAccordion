@@ -34,6 +34,18 @@
         "command": "aistudiocopy.pasteToFile",
         "title": "AI Studio: Paste Code to File",
         "icon": "$(file-add)"
+      },
+      {
+        "command": "aistudiocopy.copyProblemsWithCode",
+        "title": "AI Studio: Copy Problems With Code",
+        "icon": "$(copy)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "aistudiocopy.copyProblemsWithCode",
+        "key": "ctrl+alt+c",
+        "when": "editorTextFocus || problemsViewVisible"
       }
     ],
     "configuration": {

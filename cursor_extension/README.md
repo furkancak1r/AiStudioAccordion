@@ -9,6 +9,7 @@ Panodan kopyalanan markdown kodunu otomatik olarak belirtilen dosya yoluna yazan
 - Gerekli dizinleri otomatik oluşturur
 - Kodu belirtilen dosyaya yazar ve VS Code'da açar
 - Türkçe hata mesajları
+- Problems (Hatalar/Uyarılar) listesini kod parçalarıyla birlikte panoya kopyalar
 
 ## Kullanım
 
@@ -28,6 +29,13 @@ export default Button;
 3. "Paste Markdown Code to File" komutunu arayın ve çalıştırın
 4. Kod otomatik olarak `src/components/Button.tsx` dosyasına yazılacak
 
+### Problems (Hatalar) çıktısını kodla kopyalama
+
+1. `Ctrl+Shift+P` ile komut paletini açın
+2. "AI Studio: Copy Problems With Code" komutunu seçin
+3. "Active file" veya "Entire workspace" kapsamını seçin
+4. İlgili sorunlar, mesajları ve kod parçacıklarıyla panoya kopyalanır
+
 ## Gereksinimler
 
 - VS Code 1.102.0 veya üstü
@@ -37,6 +45,7 @@ export default Button;
 
 - İlk satırda geçerli dosya yolu bulunmazsa hata verir
 - Çalışma klasörü yoksa çalışmaz
+- Problems görünümünde seçim yakalama desteklenmediği için komut kapsamı "aktif dosya" veya "tüm çalışma alanı" olarak çalışır
 
 ---
 
