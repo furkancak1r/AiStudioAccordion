@@ -94,15 +94,21 @@ Plan yapmadan tek kod bloğunda verilir.
 
 Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece kullanıcı go faz-no derse ver.`;
 
-  chrome.storage.local.get(['systemInstructions'], function(result) {
-    if (!result.systemInstructions) {
-      chrome.storage.local.set({ systemInstructions: DEFAULT_SYSTEM_INSTRUCTIONS }, function() {
-        if (chrome.runtime.lastError) {
-          console.error('Sistem talimatları kaydedilemedi:', chrome.runtime.lastError);
+  try {
+    if (window.chrome && chrome.runtime && chrome.runtime.id && chrome.storage?.local?.get) {
+      chrome.storage.local.get(['systemInstructions'], function(result) {
+        if (!result?.systemInstructions) {
+          chrome.storage.local.set({ systemInstructions: DEFAULT_SYSTEM_INSTRUCTIONS }, function() {
+            if (chrome.runtime.lastError) {
+              console.error('Sistem talimatları kaydedilemedi:', chrome.runtime.lastError);
+            }
+          });
         }
       });
     }
-  });
+  } catch (err) {
+    console.warn('Sistem talimatları varsayılan ayarı yapılandırılamadı:', err);
+  }
 
   function scanAndEnhanceActionBars() {
     document.querySelectorAll('div.actions, .actions-container').forEach(enhanceActionBarWithVscodeButton);
@@ -344,27 +350,45 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
 
   window.getSystemInstructions = function() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(['systemInstructions'], function(result) {
-        if (chrome.runtime.lastError) {
-          console.error('Sistem talimatları alınamadı:', chrome.runtime.lastError);
-          resolve(''); // Return empty string on error
-        } else {
-          resolve(result.systemInstructions || '');
+      try {
+        if (!(window.chrome && chrome.runtime && chrome.runtime.id && chrome.storage?.local?.get)) {
+          resolve('');
+          return;
         }
-      });
+        chrome.storage.local.get(['systemInstructions'], function(result) {
+          if (chrome.runtime.lastError) {
+            console.error('Sistem talimatları alınamadı:', chrome.runtime.lastError);
+            resolve('');
+          } else {
+            resolve((result && result.systemInstructions) || '');
+          }
+        });
+      } catch (err) {
+        console.warn('Sistem talimatları alınamadı (context):', err);
+        resolve('');
+      }
     });
   };
 
   function getAutoApplySetting() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(['autoApplySystemInstructions'], function(result) {
-        if (chrome.runtime.lastError) {
-          console.error('Otomatik uygulama ayarı alınamadı:', chrome.runtime.lastError);
-          resolve(true); // Default to true on error
-        } else {
-          resolve(result.autoApplySystemInstructions !== false); // Default to true
+      try {
+        if (!(window.chrome && chrome.runtime && chrome.runtime.id && chrome.storage?.local?.get)) {
+          resolve(true);
+          return;
         }
-      });
+        chrome.storage.local.get(['autoApplySystemInstructions'], function(result) {
+          if (chrome.runtime.lastError) {
+            console.error('Otomatik uygulama ayarı alınamadı:', chrome.runtime.lastError);
+            resolve(true);
+          } else {
+            resolve((result && result.autoApplySystemInstructions) !== false);
+          }
+        });
+      } catch (err) {
+        console.warn('Otomatik uygulama ayarı alınamadı (context):', err);
+        resolve(true);
+      }
     });
   }
 
