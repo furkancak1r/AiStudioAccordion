@@ -306,6 +306,11 @@
   color: #1976d2;
 }
 
+.selection-copy-btn:hover {
+  background: #fff8e1 !important;
+  color: #ff8f00;
+}
+
 .selection-feedback-fwk {
   background: #4caf50;
   color: white;

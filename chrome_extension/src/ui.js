@@ -226,6 +226,18 @@ function createSelectionToolbar(selectedText, x, y) {
   toolbar.style.top = `${y - 50}px`;
   toolbar.style.zIndex = '10000';
   
+  // Copy button (first)
+  const copyBtn = createButton('copy', 'Kopyala', async () => {
+    try {
+      await navigator.clipboard.writeText(selectedText);
+      showNotification('Seçim panoya kopyalandı.', 'success');
+      removeSelectionToolbar();
+    } catch (err) {
+      console.error('Pano yazma hatası:', err);
+      showNotification('Kopyalama başarısız. İzin verin veya tekrar deneyin.', 'error');
+    }
+  }, 'selection-copy-btn');
+  
   const addBtn = createButton('add', 'Plan Aşamalarına Ekle', () => {
     addSelectedTextToStages(selectedText);
     removeSelectionToolbar();
@@ -236,6 +248,7 @@ function createSelectionToolbar(selectedText, x, y) {
     removeSelectionToolbar();
   }, 'selection-send-btn');
   
+  toolbar.appendChild(copyBtn);
   toolbar.appendChild(addBtn);
   toolbar.appendChild(sendBtn);
   
