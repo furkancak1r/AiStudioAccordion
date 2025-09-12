@@ -323,6 +323,32 @@ function enhanceActionBarWithVscodeButton(actionBar) {
   vscodeBtn.appendChild(focusSpan);
   vscodeBtn.appendChild(touchSpan);
 
+  // Persisted sent-state: if this block was sent earlier, keep check icon
+  try {
+    if (typeof isBlockSent === 'function' && isBlockSent(codeBlock)) {
+      // Remember original icon for hover swap
+      if (!vscodeBtn._originalIconHTML) {
+        vscodeBtn._originalIconHTML = iconSpan.innerHTML;
+      }
+      iconSpan.textContent = 'check';
+      vscodeBtn.dataset.sent = '1';
+
+      if (!vscodeBtn._hoverHandlersAttached) {
+        vscodeBtn.addEventListener('mouseenter', () => {
+          if (vscodeBtn.dataset.sent === '1' && !vscodeBtn.dataset.sending && vscodeBtn._originalIconHTML && iconSpan) {
+            iconSpan.innerHTML = vscodeBtn._originalIconHTML;
+          }
+        });
+        vscodeBtn.addEventListener('mouseleave', () => {
+          if (vscodeBtn.dataset.sent === '1' && !vscodeBtn.dataset.sending && iconSpan) {
+            iconSpan.textContent = 'check';
+          }
+        });
+        vscodeBtn._hoverHandlersAttached = true;
+      }
+    }
+  } catch {}
+
   vscodeBtn.onclick = (e) => {
     e.stopPropagation();
     sendToVscode(e);

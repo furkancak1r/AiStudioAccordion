@@ -466,6 +466,15 @@ async function sendToVscode(event) {
       uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
     }
     
+    // Persist sent-state BEFORE attempting to open protocol link
+    try {
+      if (typeof markBlockSent === 'function') {
+        markBlockSent(codeBlockElement);
+      } else if (window.AIStudioSent?.markBlockSent) {
+        window.AIStudioSent.markBlockSent(codeBlockElement);
+      }
+    } catch {}
+
     window.open(uri, '_self');
 
     if (iconSpan) {

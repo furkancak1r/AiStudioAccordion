@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Response Monitor Test</title>
+</head>
+<body>
+    <h1>AI Response Monitor Test</h1>
+    <div id="test-area">
+        <span id="status-span">Ctrl</span>
+    </div>
+    
+    <button onclick="changeToStop()">Stop Durumuna Geç</button>
+    <button onclick="changeToCtrl()">Ctrl Durumuna Geç</button>
+    <button onclick="testSequence()">Stop → Ctrl Sırasını Test Et</button>
+    
+    <script src="src/response-monitor.js"></script>
+    <script>
+        function changeToStop() {
+            document.getElementById('status-span').textContent = 'Stop';
+        }
+        
+        function changeToCtrl() {
+            document.getElementById('status-span').textContent = 'Ctrl';
+        }
+        
+        function testSequence() {
+            changeToStop();
+            setTimeout(() => {
+                changeToCtrl();
+            }, 2000);
+        }
+        
+        if (window.AIResponseMonitor) {
+            window.AIResponseMonitor.start();
+        }
+    </script>
+</body>
+</html>

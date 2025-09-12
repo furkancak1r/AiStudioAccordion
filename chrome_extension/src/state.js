@@ -4,6 +4,7 @@ let isSidebarCollapsed = false;
 let isAutoSending = false;
 let selectedIDE = 'vscode'; // default
 const cacheKey = 'markdownCache';
+const SENT_REGISTRY_KEY = 'aiSentBlocksV1';
 
 // Text selection variables
 let selectionToolbar = null;
@@ -111,5 +112,88 @@ function updateIDEButtons() {
       btn.title = 'VS Code\'a Gönder';
     }
   });
+}
+
+// ------------------------------
+// Sent-state persistence helpers
+// ------------------------------
+
+function loadSentSet() {
+  try {
+    const raw = sessionStorage.getItem(SENT_REGISTRY_KEY);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr)) return new Set(arr);
+  } catch {}
+  return new Set();
+}
+
+function saveSentSet(set) {
+  try {
+    const arr = Array.from(set);
+    sessionStorage.setItem(SENT_REGISTRY_KEY, JSON.stringify(arr));
+  } catch (e) {
+    // If saving fails (quota, etc.), degrade gracefully
+    try { sessionStorage.removeItem(SENT_REGISTRY_KEY); } catch {}
+  }
+}
+
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0; // 32-bit
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function extractFilePathFromPre(preEl) {
+  try {
+    const text = (preEl?.textContent || '').split('\n')[0].trim();
+    const m = text.match(/^(?:\/\/\s*(.*)|#\s*(.*)|\/\*\s*(.*?)\s*\*\/|<!--\s*(.*?)\s*-->|--\s*(.*)|%\s*(.*))/);
+    if (!m) return null;
+    const filePath = (m[1] || m[2] || m[3] || m[4] || m[5] || m[6] || '').trim();
+    return filePath || null;
+  } catch {
+    return null;
+  }
+}
+
+function getBlockKeyFromElement(codeBlockEl) {
+  try {
+    const pre = codeBlockEl?.querySelector('pre');
+    if (!pre) return null;
+    const filePath = extractFilePathFromPre(pre);
+    if (filePath) return `fp:${filePath}`;
+    const head = (pre.textContent || '').trim().slice(0, 500);
+    return head ? `h:${simpleHash(head)}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function isBlockSent(codeBlockEl) {
+  const key = getBlockKeyFromElement(codeBlockEl);
+  if (!key) return false;
+  const set = loadSentSet();
+  return set.has(key);
+}
+
+function markBlockSent(codeBlockEl) {
+  const key = getBlockKeyFromElement(codeBlockEl);
+  if (!key) return;
+  const set = loadSentSet();
+  set.add(key);
+  saveSentSet(set);
+  try { codeBlockEl.dataset.aiSentKey = key; } catch {}
+}
+
+// Expose for other modules if needed
+if (typeof window !== 'undefined') {
+  window.AIStudioSent = {
+    isBlockSent,
+    markBlockSent,
+    getBlockKeyFromElement
+  };
 }
   
