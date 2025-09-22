@@ -226,7 +226,6 @@ function createSelectionToolbar(selectedText, x, y) {
   toolbar.style.top = `${y - 50}px`;
   toolbar.style.zIndex = '10000';
   
-  // Copy button (first)
   const copyBtn = createButton('copy', 'Kopyala', async () => {
     try {
       await navigator.clipboard.writeText(selectedText);
@@ -289,6 +288,7 @@ function enhanceActionBarWithVscodeButton(actionBar) {
     return;
   }
 
+  const turnElement = actionBar.closest('ms-chat-turn');
   const container = actionBar.classList.contains('actions') || actionBar.classList.contains('actions-container')
     ? actionBar
     : actionBar.closest('.actions, .actions-container');
@@ -323,31 +323,27 @@ function enhanceActionBarWithVscodeButton(actionBar) {
   vscodeBtn.appendChild(focusSpan);
   vscodeBtn.appendChild(touchSpan);
 
-  // Persisted sent-state: if this block was sent earlier, keep check icon
-  try {
-    if (typeof isBlockSent === 'function' && isBlockSent(codeBlock)) {
-      // Remember original icon for hover swap
-      if (!vscodeBtn._originalIconHTML) {
-        vscodeBtn._originalIconHTML = iconSpan.innerHTML;
-      }
-      iconSpan.textContent = 'check';
-      vscodeBtn.dataset.sent = '1';
-
-      if (!vscodeBtn._hoverHandlersAttached) {
-        vscodeBtn.addEventListener('mouseenter', () => {
-          if (vscodeBtn.dataset.sent === '1' && !vscodeBtn.dataset.sending && vscodeBtn._originalIconHTML && iconSpan) {
-            iconSpan.innerHTML = vscodeBtn._originalIconHTML;
-          }
-        });
-        vscodeBtn.addEventListener('mouseleave', () => {
-          if (vscodeBtn.dataset.sent === '1' && !vscodeBtn.dataset.sending && iconSpan) {
-            iconSpan.textContent = 'check';
-          }
-        });
-        vscodeBtn._hoverHandlersAttached = true;
-      }
+  if (turnElement && turnElement.id && window.AIStudioSentState && window.AIStudioSentState.sentTurnIds.has(turnElement.id)) {
+    if (!vscodeBtn._originalIconHTML) {
+      vscodeBtn._originalIconHTML = iconSpan.innerHTML;
     }
-  } catch {}
+    iconSpan.textContent = 'check';
+    vscodeBtn.dataset.sent = 'true';
+
+    if (!vscodeBtn._hoverHandlersAttached) {
+      vscodeBtn.addEventListener('mouseenter', () => {
+        if (vscodeBtn.dataset.sent === 'true' && !vscodeBtn.dataset.sending && vscodeBtn._originalIconHTML && iconSpan) {
+          iconSpan.innerHTML = vscodeBtn._originalIconHTML;
+        }
+      });
+      vscodeBtn.addEventListener('mouseleave', () => {
+        if (vscodeBtn.dataset.sent === 'true' && !vscodeBtn.dataset.sending && iconSpan) {
+          iconSpan.textContent = 'check';
+        }
+      });
+      vscodeBtn._hoverHandlersAttached = true;
+    }
+  }
 
   vscodeBtn.onclick = (e) => {
     e.stopPropagation();

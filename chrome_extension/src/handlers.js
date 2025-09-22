@@ -404,6 +404,7 @@ function clickRunWithRetry(runButton, maxAttempts = 3, delayMs = 1000) {
 
 async function sendToVscode(event) {
   const button = event.currentTarget;
+  const turnElement = button.closest('ms-chat-turn');
   const codeBlockElement = button.closest('ms-code-block');
   if (!codeBlockElement) {
     showPopup('İlişkili kod bloğu bulunamadı.', 'warning', 'Uyarı');
@@ -417,7 +418,6 @@ async function sendToVscode(event) {
   }
   
   const iconSpan = button.querySelector('.material-symbols-outlined');
-  // Persist original icon once so it doesn't get lost after state changes
   if (iconSpan && !button._originalIconHTML) {
     button._originalIconHTML = iconSpan.innerHTML;
   }
@@ -466,33 +466,25 @@ async function sendToVscode(event) {
       uri = `${uriScheme}://furkan.aistudiocopy?file=${encodedPath}&content=${encodedContent}`;
     }
     
-    // Persist sent-state BEFORE attempting to open protocol link
-    try {
-      if (typeof markBlockSent === 'function') {
-        markBlockSent(codeBlockElement);
-      } else if (window.AIStudioSent?.markBlockSent) {
-        window.AIStudioSent.markBlockSent(codeBlockElement);
-      }
-    } catch {}
-
+    if (turnElement && turnElement.id) {
+      window.AIStudioSentState.sentTurnIds.add(turnElement.id);
+    }
     window.open(uri, '_self');
 
     if (iconSpan) {
-      // Mark as sent and keep the "check" icon visible
       iconSpan.textContent = 'check';
-      button.dataset.sent = '1';
+      button.dataset.sent = 'true';
       button.disabled = false;
       delete button.dataset.sending;
 
-      // Attach hover handlers once to temporarily show original icon
       if (!button._hoverHandlersAttached) {
         button.addEventListener('mouseenter', () => {
-          if (button.dataset.sent === '1' && !button.dataset.sending && button._originalIconHTML && iconSpan) {
+          if (button.dataset.sent === 'true' && !button.dataset.sending && button._originalIconHTML && iconSpan) {
             iconSpan.innerHTML = button._originalIconHTML;
           }
         });
         button.addEventListener('mouseleave', () => {
-          if (button.dataset.sent === '1' && !button.dataset.sending && iconSpan) {
+          if (button.dataset.sent === 'true' && !button.dataset.sending && iconSpan) {
             iconSpan.textContent = 'check';
           }
         });
