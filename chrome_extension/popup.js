@@ -1,4 +1,4 @@
-// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/popup.js
+﻿// C:/Users/furkan.cakir/Desktop/FurkanPRS/Kodlar/test/AiStudioAccordion/chrome_extension/popup.js
 const STORAGE_KEY = 'selectedIDE';
 const SYSTEM_INSTRUCTIONS_KEY = 'systemInstructions';
 const AUTO_APPLY_KEY = 'autoApplySystemInstructions';
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const autoApplyToggle = document.getElementById('autoApplyToggle');
     
     chrome.storage.local.get([STORAGE_KEY, SYSTEM_INSTRUCTIONS_KEY, AUTO_APPLY_KEY], function(result) {
-        const selectedIDE = result[STORAGE_KEY] || 'vscode';
+        const selectedIDE = result[STORAGE_KEY] || 'cursor';
         updateSelectedVisuals(selectedIDE);
         
         if (result[SYSTEM_INSTRUCTIONS_KEY] && systemInstructionsTextarea) {
@@ -144,3 +144,4 @@ function showToggleFeedback(isEnabled) {
         description.style.color = originalColor;
     }, 2000);
 }
+

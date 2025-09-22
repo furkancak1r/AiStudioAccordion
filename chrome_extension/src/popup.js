@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'selectedIDE';
+﻿const STORAGE_KEY = 'selectedIDE';
 const SYSTEM_INSTRUCTIONS_KEY = 'systemInstructions';
 const AUTO_APPLY_KEY = 'autoApplySystemInstructions';
 const MAX_INSTRUCTIONS_SIZE = 50000; // 50KB limit
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const autoApplyToggle = document.getElementById('autoApplyToggle');
     
     chrome.storage.local.get([STORAGE_KEY, SYSTEM_INSTRUCTIONS_KEY, AUTO_APPLY_KEY], function(result) {
-        const selectedIDE = result[STORAGE_KEY] || 'vscode';
+        const selectedIDE = result[STORAGE_KEY] || 'cursor';
         updateSelectedVisuals(selectedIDE);
         
         if (result[SYSTEM_INSTRUCTIONS_KEY] && systemInstructionsTextarea) {
@@ -138,3 +138,4 @@ function showToggleFeedback(isEnabled) {
     }, 2000);
 }
   
+

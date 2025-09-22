@@ -1,8 +1,8 @@
-let sidebar, body, clearAllBtn, toggleBtn, addStageBtn, header;
+﻿let sidebar, body, clearAllBtn, toggleBtn, addStageBtn, header;
 let detectedSections = [];
 let isSidebarCollapsed = false;
 let isAutoSending = false;
-let selectedIDE = 'vscode'; // default
+let selectedIDE = 'cursor'; // default
 const cacheKey = 'markdownCache';
 const SENT_REGISTRY_KEY = 'aiSentBlocksV1';
 
@@ -197,3 +197,4 @@ if (typeof window !== 'undefined') {
   };
 }
   
+
