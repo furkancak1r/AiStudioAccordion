@@ -201,12 +201,18 @@ importBtn.onclick = importFromClipboard;
 footer.append(importBtn);
 sidebar.append(header, body, footer);
 
-const historyElement = document.querySelector('ms-prompt-history');
-if (historyElement && historyElement.parentElement) {
-  historyElement.parentElement.insertBefore(sidebar, historyElement.nextSibling);
-} else {
-  document.body.appendChild(sidebar);
-}
+  const historyElement = document.querySelector('ms-prompt-history-v3') || document.querySelector('ms-prompt-history');
+  if (historyElement && historyElement.parentElement) {
+    historyElement.parentElement.insertBefore(sidebar, historyElement.nextSibling);
+  } else {
+    // Fallback: try to find the playground wrapper
+    const playgroundWrapper = document.querySelector('ms-nav-items-v3-playground .wrapper');
+    if (playgroundWrapper && playgroundWrapper.parentElement) {
+       playgroundWrapper.parentElement.appendChild(sidebar);
+    } else {
+       document.body.appendChild(sidebar);
+    }
+  }
 
 getCachedData();
 renderSections();

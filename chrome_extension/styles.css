@@ -1009,3 +1009,14 @@ ms-chat-turn:has([data-turn-role="User"]):hover {
   opacity: 1;
 }
   
+.system-instructions-applied,
+.markdown-sidebar-fwk,
+.git-commit-btn-fwk,
+.analyze-files-btn-fwk,
+.reevaluate-btn-fwk,
+.markdown-vscode-btn-fwk,
+.plan-stages-navbar-item .nav-item {
+  border: 2px solid #4caf50 !important;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5) !important;
+  transition: all 0.3s ease-in-out;
+}

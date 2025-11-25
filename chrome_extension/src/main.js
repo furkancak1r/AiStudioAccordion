@@ -294,10 +294,15 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
     navbarIcon.appendChild(iconLink);
     
     // Insert in the nav-items section, after history
-    const navItems = document.querySelector('.nav-items');
-    const historyElement = document.querySelector('ms-prompt-history');
+    const navItems = document.querySelector('.nav-items') || document.querySelector('ms-nav-items-v3-main');
+    const historyElement = document.querySelector('ms-prompt-history-v3') || document.querySelector('ms-prompt-history');
     if (navItems && historyElement) {
-      navItems.insertBefore(navbarIcon, historyElement.nextSibling);
+      // If navItems is not the direct parent, we might need to find the correct parent or just insert after historyElement
+      if (historyElement.parentElement === navItems) {
+          navItems.insertBefore(navbarIcon, historyElement.nextSibling);
+      } else if (historyElement.parentElement) {
+          historyElement.parentElement.insertBefore(navbarIcon, historyElement.nextSibling);
+      }
     }
   }
 
@@ -401,13 +406,20 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
         systemInstructionsTextarea.value = instructions;
         systemInstructionsTextarea.dispatchEvent(new Event('input', { bubbles: true }));
         
+        // Close the dialog after a short delay to ensure value is registered
         setTimeout(() => {
-          const systemInstructionsButton = document.querySelector('button[aria-label="System instructions"]');
-          if (systemInstructionsButton) {
-            systemInstructionsButton.click();
-          }
-        }, 100);
-  
+            const closeButton = document.querySelector('button[data-test-close-button]');
+            if (closeButton) {
+                closeButton.click();
+                // Add visual feedback to the card
+                setTimeout(() => {
+                    const card = document.querySelector('.system-instructions-card');
+                    if (card) {
+                        card.classList.add('system-instructions-applied');
+                    }
+                }, 300);
+            }
+        }, 200);
       }
     });
   }
@@ -424,12 +436,27 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
       promptContainer.dataset.systemPromptOpened = 'true';
       return;
     }
+
+    // Check if instructions are already applied by looking at the card subtitle
+    const card = document.querySelector('.system-instructions-card');
+    if (card) {
+        const subtitle = card.querySelector('.subtitle');
+        // Check for a key part of the instructions to verify if they are already applied
+        if (subtitle && subtitle.textContent.includes('İş Akışı ve Yanıt Kuralları (v10)')) {
+            // Already applied, just add the visual class
+            card.classList.add('system-instructions-applied');
+            promptContainer.dataset.systemPromptOpened = 'true';
+            return;
+        }
+    }
   
     const systemInstructionsButton = document.querySelector('button[aria-label="System instructions"]');
+    // If card exists, use that to open (it's the trigger), otherwise fallback to button
+    const triggerButton = card || systemInstructionsButton;
     const systemInstructionsTextarea = document.querySelector('textarea[aria-label="System instructions"]');
   
-    if (systemInstructionsButton && !systemInstructionsTextarea) {
-      systemInstructionsButton.click();
+    if (triggerButton && !systemInstructionsTextarea) {
+      triggerButton.click();
       promptContainer.dataset.systemPromptOpened = 'true';
     }
   }
@@ -508,9 +535,61 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
     }, 1000);
   }
 
+  function isPromptsPage() {
+    return window.location.href.includes('/prompts');
+  }
+
+  function cleanup() {
+    // Remove Sidebar
+    const sidebar = document.querySelector('.markdown-sidebar-fwk');
+    if (sidebar) sidebar.remove();
+
+    // Remove Navbar Icon
+    const navbarIcon = document.querySelector('.plan-stages-navbar-item');
+    if (navbarIcon) navbarIcon.remove();
+
+    // Remove Prompt Buttons
+    document.querySelectorAll('.git-commit-btn-fwk, .analyze-files-btn-fwk, .reevaluate-btn-fwk').forEach(btn => {
+        const wrapper = btn.closest('.button-wrapper');
+        if (wrapper) wrapper.remove();
+    });
+
+    // Remove VS Code Buttons
+    document.querySelectorAll('.markdown-vscode-btn-fwk').forEach(btn => btn.remove());
+
+    // Reset Flags
+    document.querySelectorAll('[data-prompt-enhanced]').forEach(el => delete el.dataset.promptEnhanced);
+    document.querySelectorAll('[data-settings-configured]').forEach(el => delete el.dataset.settingsConfigured);
+    document.querySelectorAll('[data-vscode-btn-injected]').forEach(el => delete el.dataset.vscodeBtnInjected);
+    
+    // Remove System Prompt Opened Flag
+    document.querySelectorAll('[data-system-prompt-opened]').forEach(el => delete el.dataset.systemPromptOpened);
+  }
+
+  let lastUrl = window.location.href;
+
   const observer = new MutationObserver((mutations) => {
+    const currentUrl = window.location.href;
+    const isPrompts = isPromptsPage();
+
+    if (currentUrl !== lastUrl) {
+        lastUrl = currentUrl;
+        if (!isPrompts) {
+            cleanup();
+            return;
+        } else {
+             // Re-run initialization if we just came back to prompts
+             initializeSidebar();
+             scanAndEnhanceActionBars();
+             scanAndEnhancePromptInputs();
+             scanAndConfigureModelSettings();
+        }
+    }
+
+    if (!isPrompts) return;
+
     initializeSidebar();
-    autoOpenAndApplySystemInstructions();
+    autoOpenAndApplySystemInstructions(); // Re-enabled with new logic
     
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
@@ -537,10 +616,12 @@ Not: Her zaman ya PLAN ver ya KOD ver; ikisini aynı anda verme ve KOD'u sadece 
     });
   });
 
-  initializeSidebar();
-  scanAndEnhanceActionBars();
-  scanAndEnhancePromptInputs();
-  scanAndConfigureModelSettings();
+  if (isPromptsPage()) {
+    initializeSidebar();
+    scanAndEnhanceActionBars();
+    scanAndEnhancePromptInputs();
+    scanAndConfigureModelSettings();
+  }
   loadIDEPreference(); 
   setupTextSelectionListener(); 
   setupSystemInstructionsObserver(); 
